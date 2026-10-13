@@ -27,7 +27,7 @@ Requires Node 24+, pnpm 12, Docker. First time: `cp .env.example .env && pnpm in
 - `pnpm test:e2e` — builds, starts all apps, runs Playwright smoke tests (needs `docker compose up -d`)
 
 ## Getting code into main
-The user approves every commit and merges every PR. Rules: `.cursor/rules/guardrails.mdc`.
+The user reviews and merges every PR on GitHub; nothing reaches `main` otherwise. Rules: `.cursor/rules/guardrails.mdc`.
 
 ## Pitfalls
 - A shell hook (`.cursor/hooks.json`) enforces `.cursor/rules/guardrails.mdc`. If a command is blocked, don't work around it; ask the user.

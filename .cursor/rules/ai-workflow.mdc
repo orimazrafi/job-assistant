@@ -6,7 +6,7 @@ alwaysApply: true
 # AI workflow
 
 Task size:
-- One task card = one chat session = one branch, one commit, one PR. Target 30–90 minutes of work.
+- One task card = one chat session = one branch and one PR (one commit, plus fixes for review comments). Target 30–90 minutes of work.
 - A task card has: Spec link, Files, Do, Don't, Done when (see `docs/tasks/_template.md`).
 - If a task grows beyond its card, stop and propose splitting it.
 

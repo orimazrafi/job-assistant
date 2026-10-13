@@ -16,7 +16,9 @@ function cmd(source, flags = 'i') {
 }
 
 // Order matters: the first matching rule wins, so deny rules come before ask rules.
-// A rule with `onBranch` only applies when the current branch matches it.
+// A rule with `onBranch` only applies when the current branch matches it; one with
+// `branchUnknown` only when the hook could not read the branch.
+// Commits, card-branch pushes, and PRs are allowed: the user reviews at the PR merge.
 const RULES = [
   // --- deny: code reaches main only through a PR the user merges on GitHub ---
   { permission: 'deny', reason: 'merges a pull request (only the user merges, on GitHub)', pattern: cmd(String.raw`gh\s+pr\s+merge\b`) },
@@ -37,9 +39,8 @@ const RULES = [
 
   // --- ask: allowed only with the user's explicit approval ---
   { permission: 'ask', reason: 'runs E2E tests (builds and starts all apps)', pattern: /\bpnpm\s+(?:run\s+)?test:e2e\b|\bplaywright\s+test\b/i },
-  { permission: 'ask', reason: 'creates a commit (review the changes shown in chat first)', pattern: cmd(String.raw`git\s+commit\b`) },
-  { permission: 'ask', reason: 'pushes to a remote', pattern: cmd(String.raw`git\s+push\b`) },
-  { permission: 'ask', reason: 'publishes to GitHub (repo or pull request)', pattern: cmd(String.raw`gh\s+(?:repo|pr)\s+create\b`) },
+  { permission: 'ask', reason: 'commits or pushes, and the current branch is unknown (it could be main)', pattern: cmd(String.raw`git\s+(?:commit|merge|push)\b`), branchUnknown: true },
+  { permission: 'ask', reason: 'creates a GitHub repository', pattern: cmd(String.raw`gh\s+repo\s+create\b`) },
   { permission: 'ask', reason: 'opens a database client', pattern: /\b(?:psql|mongosh|redis-cli)\b/i },
   { permission: 'ask', reason: 'touches the .env secrets file', pattern: /(?:^|[\s"'=\\/])\.env(?![\w.])/ },
   { permission: 'ask', reason: 'recursively deletes files', pattern: /\brm\s+-[a-z]*(?:rf|fr)\b|\bRemove-Item\b[^|;&]*-Recurse\b/i },
@@ -48,12 +49,13 @@ const RULES = [
 /**
  * Decides whether a shell command may run.
  * @param {string} command Full command line as the agent wants to run it.
- * @param {Context} [context] Branch-aware rules are skipped when the branch is unknown.
+ * @param {Context} [context] Current branch; when unknown, commits and pushes need approval.
  * @returns {Decision} First matching rule's decision, or allow.
  */
 export function evaluate(command, context = {}) {
   for (const rule of RULES) {
     if (rule.onBranch && rule.onBranch !== context.branch) continue;
+    if (rule.branchUnknown && context.branch) continue;
     if (rule.pattern.test(command)) return { permission: rule.permission, reason: rule.reason };
   }
   return { permission: 'allow' };
