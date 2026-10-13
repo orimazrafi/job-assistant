@@ -1,12 +1,14 @@
 # Progress
 
 ## Current focus
-Walking skeleton is done. Next: auth slice A (email account), starting with task 001-01.
+Walking skeleton is done and the repo is public on GitHub: https://github.com/orimazrafi/job-assistant. Next: auth slice A (email account), starting with task 001-01.
 
-## Done this session
+## Done recently
 - Walking skeleton (spec 000), one commit per card 000-01 … 000-05:
   monorepo + Docker infra, API health check, worker + queue ping, React status page, Playwright smoke + CI workflow.
-- Tests: 20 unit (API 11, worker 4, web 5), 2 integration (Testcontainers), 2 E2E — all green.
+- Tests: 20 unit (API 11, worker 4, web 5), 3 hook-rule suites, 2 integration (Testcontainers), 2 E2E — all green locally.
+- `AGENTS.md` trimmed to "how to work here" with a where-things-go map.
+- Guardrails: `guardrails.mdc` and `definition-of-done.mdc` (always applied); shell hook `.cursor/hooks/guard-shell.mjs` denies destructive commands and asks before E2E, pushes, DB clients, and secrets access.
 - Auth task cards reorganized into vertical slices; LinkedIn SSO marked optional.
 
 ## Decisions made
@@ -15,8 +17,9 @@ Walking skeleton is done. Next: auth slice A (email account), starting with task
 
 ## Open issues
 - Local Postgres for this project is on host port **5433** (a native PostgreSQL 16 service uses 5432).
-- CI workflow has not run yet: the repo has no GitHub remote.
+- First CI run on GitHub Actions: check it passes after the initial push.
 - pnpm 12 requires explicit build-script approval; optional native add-ons are denied in `pnpm-workspace.yaml` (`allowBuilds`).
+- The guard hook only sees the agent's shell commands, not the user's own terminal.
 - Confirm seed list of central-Israel companies for spec 002.
 
 ## Next steps
@@ -27,6 +30,7 @@ Walking skeleton is done. Next: auth slice A (email account), starting with task
 ## Roadmap
 - [x] AI workflow setup
 - [x] Walking skeleton + CI
+- [x] Guardrails (rules + shell hook)
 - [ ] Auth
 - [ ] Job fetching
 - [ ] Relevance scoring
