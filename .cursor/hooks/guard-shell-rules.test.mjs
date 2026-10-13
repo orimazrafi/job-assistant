@@ -45,18 +45,46 @@ describe('guard-shell rules', () => {
     });
   });
 
-  it('allows the card-branch flow, with approval for commit, push, and PR', () => {
+  it('closes the bypasses that reach main from a card branch', () => {
+    const onCard = { branch: 'card/001-01' };
+    expectAll('deny', [
+      // switch chained with commit/merge/push: the hook only saw the card branch
+      'git switch main && git merge card/001-01 && git push',
+      'git checkout main; git commit -m "x"',
+      'git switch main\ngit push',
+      'git switch -c card/x && git commit -m "x"',
+      // other ways to name or include main
+      'git push --all',
+      'git push origin --all',
+      'git push --mirror',
+      'git push origin HEAD:refs/heads/main',
+      'git push origin +refs/heads/main',
+      'git push origin --delete main',
+      // global options before the subcommand
+      'git -C . push origin main',
+      'git -c user.name=x push origin HEAD:main',
+      'git --no-pager push --all',
+    ], onCard);
+    expectAll('deny', ['git -C . commit -m "x"', 'git --no-pager merge card/x'], { branch: 'main' });
+  });
+
+  it('allows the card-branch flow: commit, push, and open a PR without asking', () => {
     const onCard = { branch: 'card/001-01' };
     expectAll('allow', ['git switch -c card/001-01', 'git diff --stat', 'git pull', 'gh pr view 12'], onCard);
-    expectAll('ask', ['git commit -m "feat(001-01): users table"', 'git push -u origin card/001-01'], onCard);
-    expectAll('ask', ['git push origin card/main-page', 'git push origin main-fix'], { branch: 'card/main-page' });
-    expectAll('ask', ['gh pr create --fill', 'gh repo create job-assistant --public'], onCard);
-    expectAll('ask', ['git commit -m "x"', 'git push origin card/x']);
+    expectAll('allow', ['git commit -m "feat(001-01): users table"', 'git push -u origin card/001-01'], onCard);
+    expectAll('allow', ['gh pr create --fill --base main', 'git push origin card/001-01:refs/heads/card/001-01'], onCard);
+    expectAll('allow', ['git switch main', 'git checkout -b card/001-02', 'git switch main && git pull'], onCard);
+    expectAll('allow', ['git push origin card/main-page', 'git push origin main-fix'], { branch: 'card/main-page' });
+  });
+
+  it('asks before commit or push when the branch is unknown, and before creating a repo', () => {
+    expectAll('ask', ['git commit -m "x"', 'git merge card/x', 'git push', 'git push origin card/x']);
+    expectAll('ask', ['gh repo create job-assistant --public'], { branch: 'card/001-01' });
   });
 
   it('judges git/gh/docker by the command, not by words in quoted text', () => {
     const onCard = { branch: 'card/x' };
-    expectAll('ask', [
+    expectAll('allow', [
       'git commit -m "chore: deny gh pr merge and git push --force on main"',
       'git commit -m "docs: never run docker compose down -v" -m "or git reset --hard"',
     ], onCard);
@@ -69,12 +97,11 @@ describe('guard-shell rules', () => {
     ], onCard);
   });
 
-  it('asks before E2E, push, DB clients, .env, and recursive deletes', () => {
+  it('asks before E2E, DB clients, .env, and recursive deletes', () => {
     expectAll('ask', [
       'pnpm test:e2e',
       'pnpm run test:e2e',
       'pnpm exec playwright test',
-      'git push origin card/001-01',
       'psql -h localhost -p 5433 -U job',
       'mongosh mongodb://localhost:27017',
       'redis-cli ping',

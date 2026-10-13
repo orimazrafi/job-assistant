@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Guardrails
 
-A shell hook (`.cursor/hooks/guard-shell.mjs`) enforces the most dangerous of these. Rules still apply where the hook cannot see.
+A shell hook (`.cursor/hooks/guard-shell.mjs`) enforces the most dangerous of these, and a GitHub ruleset on `main` refuses direct pushes. Rules still apply where neither can see.
 
 Never:
 - Change a database schema or data by hand (psql, mongosh, redis-cli writes). Schema changes go through migrations; data changes go through app code or seed scripts.
@@ -15,15 +15,16 @@ Never:
 - Weaken, skip, or delete tests to make them pass.
 - Commit, merge, or push on `main`, or merge a PR (`gh pr merge`). Only the user merges, on GitHub.
 
-Code review gate (the user approves all code that goes in):
+Code review gate (the user reviews all code on GitHub, at the PR merge):
 - Work on a branch per task card, e.g. `card/001-01`. Create it as a separate command before editing.
-- Before `git commit`: show the user a short summary of what changed and why, plus `git diff --stat`. Then run the commit; the hook asks the user to approve it.
-- After a commit is approved: ask before pushing the branch and opening a PR (`gh pr create`).
+- On the card branch, commit, push, and open the PR (`gh pr create --base main`) without asking. The repo is public: never push secrets or `.env` content.
+- The PR description says why, what changed, the tests run, and the card's Verify steps, so the user can review there.
+- Review comments are fixed with new commits on the same branch.
 - After the user merges on GitHub: `git switch main` and `git pull`.
 
 Ask the user first:
 - Running E2E tests (`pnpm test:e2e`, `playwright test`): they build and start all apps on ports 3000/4173.
-- `git commit`, `git push`, opening PRs, or anything that leaves this machine.
+- Pushing anything other than a card branch, creating repos, or anything else that leaves this machine.
 - Opening a database client (psql, mongosh, redis-cli), even read-only.
 - Installing global tools, starting/stopping Docker or system services, killing processes the agent didn't start.
 - Adding a dependency, or changing CI, Docker, or tooling config outside the task card.

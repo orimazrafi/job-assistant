@@ -12,8 +12,8 @@ Before saying a task is done:
 4. Feature doc and diagrams in `docs/features/` match the code; ADR added if a hard-to-reverse choice was made.
 5. Task card status set to `done` in `docs/tasks/`.
 6. Run the `handoff` skill to update `docs/progress.md`.
-7. Report to the user: what changed, test results, the card's **Verify** steps, whether E2E ran, and `git diff --stat`.
-8. Only after the user approves: one commit on the card branch, `type(card-id): summary`; body explains why, plus any new dependency.
-9. Ask before pushing the branch and opening a PR. The user merges it on GitHub.
+7. Commit on the card branch, `type(card-id): summary`; body explains why, plus any new dependency.
+8. Push the branch and open a PR to `main` (see `guardrails.mdc`); wait for CI.
+9. Report to the user: the PR link, what changed, test and CI results, the card's **Verify** steps, and whether E2E ran. The user merges on GitHub.
 
 Then stop. Do not start the next task card without being asked.
