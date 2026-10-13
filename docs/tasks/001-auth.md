@@ -15,7 +15,7 @@ Each card = one chat session = one commit (30–90 min). The app must start afte
 - **Don't:** add auth logic or endpoints.
 - **Done when:** integration tests (Testcontainers Postgres) pass, including unique email.
 - **Verify:** `pnpm db:migrate` succeeds; `/api/health` still ok.
-- **Status:** todo
+- **Status:** done
 
 ### 001-02: Session store, cookie, guard, `/auth/me`
 - **Files:** `apps/api/src/auth/session.store.ts`, `session.guard.ts`, `cookie.ts`, `current-user.decorator.ts` (+ specs)

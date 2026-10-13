@@ -1,6 +1,6 @@
 # Feature: Authentication
 
-**Status:** Designed
+**Status:** In progress (`users` table and repository done; no endpoints yet)
 **Spec:** [001](../specs/001-auth.md) · **Tasks:** [001](../tasks/001-auth.md)
 
 ## TL;DR
@@ -69,10 +69,11 @@ erDiagram
     USERS ||--o{ USER_IDENTITIES : "signs in with"
     USERS {
         uuid id PK
-        text email UK
+        text email UK "trimmed, lowercase"
         text password_hash "null for SSO-only"
         bool email_verified
         timestamptz created_at
+        timestamptz updated_at
     }
     USER_IDENTITIES {
         uuid id PK
@@ -89,10 +90,13 @@ Redis keys:
 - `oidc:<state>` → `{ nonce, verifier, provider }`, TTL 5 min
 - `rl:login:ip:<ip>`, `rl:login:acct:<email>` → failure counters, TTL 15 min
 
+Built so far: `USERS` (migration `apps/api/migrations/*_create-users.sql`). A check constraint keeps emails trimmed and lowercase, so the unique constraint makes sign-up case-insensitive. `USER_IDENTITIES` comes with Google sign-in (card 001-07).
+
 Unique constraint: `(provider, provider_user_id)` on `user_identities`.
 
 ## Key decisions
 - Sessions in Redis, not JWT — [ADR 003](../adr/003-server-side-sessions.md)
+- Schema changes as plain SQL migrations with node-pg-migrate — [ADR 006](../adr/006-migrations-node-pg-migrate.md)
 
 ## Failure handling
 - Expired/unknown session → 401 → React redirects to `/login`.
@@ -102,5 +106,6 @@ Unique constraint: `(provider, provider_user_id)` on `user_identities`.
 
 ## Where the code lives (planned)
 - `apps/api/src/auth/` — controllers, services, guard, OIDC client, session store
-- `apps/api/src/users/` — users + identities repositories
+- `apps/api/src/users/` — `UsersRepository` (built), identities repository (planned)
+- `apps/api/migrations/` — SQL migrations
 - `apps/web/src/features/auth/` — `useAuth`, login page, protected route
