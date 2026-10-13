@@ -45,8 +45,10 @@ describe('GET /api/health (real databases)', () => {
     }
   });
 
-  it('returns 503 and keeps reporting the others when Redis goes down', async () => {
-    await redis.stop();
+  it('returns 503 and keeps reporting the others when Redis is unresponsive', async () => {
+    // Pausing (not stopping) Redis exceeds the 2 s check timeout, then recovers by itself,
+    // so the app can still shut down cleanly afterwards.
+    await redis.executeCliCmd('CLIENT', ['PAUSE', '3000', 'ALL']);
 
     const res = await request(app.getHttpServer()).get('/api/health').expect(503);
 

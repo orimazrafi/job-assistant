@@ -1,8 +1,10 @@
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { validateEnv } from './config/env.js';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { validateEnv, type Env } from './config/env.js';
 import { HealthModule } from './health/health.module.js';
 import { InfraModule } from './infra/infra.module.js';
+import { SystemModule } from './system/system.module.js';
 
 @Module({
   imports: [
@@ -13,8 +15,15 @@ import { InfraModule } from './infra/infra.module.js';
       envFilePath: ['.env', '../../.env'],
       validate: validateEnv,
     }),
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService<Env, true>) => ({
+        connection: { url: config.get('REDIS_URL', { infer: true }) },
+      }),
+    }),
     InfraModule,
     HealthModule,
+    SystemModule,
   ],
 })
 export class AppModule {}

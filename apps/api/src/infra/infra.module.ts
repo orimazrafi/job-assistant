@@ -1,10 +1,12 @@
-import { Global, Inject, Injectable, Module, OnApplicationShutdown } from '@nestjs/common';
+import { Global, Inject, Injectable, Logger, Module, OnApplicationShutdown } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Redis } from 'ioredis';
 import { MongoClient } from 'mongodb';
 import { Pool } from 'pg';
 import type { Env } from '../config/env.js';
 import { MONGO_CLIENT, PG_POOL, REDIS } from './tokens.js';
+
+const logger = new Logger('InfraModule');
 
 /** Closes all infrastructure clients when the app shuts down, so the process exits cleanly. */
 @Injectable()
@@ -50,8 +52,14 @@ class InfraShutdown implements OnApplicationShutdown {
     {
       provide: REDIS,
       inject: [ConfigService],
-      useFactory: (config: ConfigService<Env, true>) =>
-        new Redis(config.get('REDIS_URL', { infer: true }), { maxRetriesPerRequest: 1 }),
+      useFactory: (config: ConfigService<Env, true>) => {
+        const redis = new Redis(config.get('REDIS_URL', { infer: true }), {
+          maxRetriesPerRequest: 1,
+        });
+        // Without a listener, ioredis reports outages as unhandled errors; it reconnects by itself.
+        redis.on('error', (error) => logger.warn(`Redis connection error: ${String(error)}`));
+        return redis;
+      },
     },
     InfraShutdown,
   ],
