@@ -19,7 +19,7 @@ export default defineConfig(
     },
   },
   {
-    files: ['apps/api/**', 'apps/worker/**', 'packages/**', 'e2e/**', '*.{js,ts}'],
+    files: ['apps/api/**', 'apps/worker/**', 'packages/**', 'e2e/**', '.cursor/hooks/**', '*.{js,ts}'],
     languageOptions: { globals: globals.node },
   },
   {

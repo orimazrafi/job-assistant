@@ -27,6 +27,7 @@ Requires Node 24+, pnpm 12, Docker. First time: `cp .env.example .env && pnpm in
 - `pnpm test:e2e` — builds, starts all apps, runs Playwright smoke tests (needs `docker compose up -d`)
 
 ## Pitfalls
+- A shell hook (`.cursor/hooks.json`) blocks destructive commands and asks before E2E, pushes, DB clients, and `.env` access. If a command is blocked, don't work around it; ask the user.
 - ESM everywhere: relative imports end in `.js` in `apps/api`, `apps/worker`, `packages/shared`.
 - After changing `packages/shared`, it rebuilds automatically under `pnpm dev`; otherwise run `pnpm --filter @job-assistant/shared build`.
 - Postgres is on host port 5433, not 5432 (a native PostgreSQL may own 5432).

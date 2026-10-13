@@ -7,7 +7,7 @@ alwaysApply: false
 # Data stores
 
 PostgreSQL (source of truth, relational data):
-- Every schema change is a migration. Never edit an applied migration.
+- Every schema change is a new migration file. Forbidden actions (manual DB changes, editing applied migrations) are in `guardrails.mdc`.
 - snake_case tables/columns, `id uuid`, `created_at`/`updated_at timestamptz`.
 - Unique constraints enforce invariants (e.g. `(source, external_id)` on jobs).
 - Parameterized queries only; never interpolate strings into SQL.

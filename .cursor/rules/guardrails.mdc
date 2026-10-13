@@ -1,0 +1,22 @@
+---
+description: Actions the agent must never take, or must ask before taking
+alwaysApply: true
+---
+
+# Guardrails
+
+A shell hook (`.cursor/hooks/guard-shell.mjs`) enforces the most dangerous of these. Rules still apply where the hook cannot see.
+
+Never:
+- Change a database schema or data by hand (psql, mongosh, redis-cli writes). Schema changes go through migrations; data changes go through app code or seed scripts.
+- Edit or delete an applied migration.
+- Run destructive commands: `docker compose down -v`, `docker volume rm/prune`, `git reset --hard`, `git push --force`, `git clean -f`, `git branch -D`, dropping databases/tables, `FLUSHALL`.
+- Read, print, or edit `.env` or any secret; use `.env.example` instead.
+- Weaken, skip, or delete tests to make them pass.
+
+Ask the user first:
+- Running E2E tests (`pnpm test:e2e`, `playwright test`): they build and start all apps on ports 3000/4173.
+- `git push`, opening PRs, or anything that leaves this machine.
+- Opening a database client (psql, mongosh, redis-cli), even read-only.
+- Installing global tools, starting/stopping Docker or system services, killing processes the agent didn't start.
+- Adding a dependency, or changing CI, Docker, or tooling config outside the task card.
