@@ -29,11 +29,11 @@ Requires Node 24+, pnpm 12, Docker. First time: `cp .env.example .env && pnpm in
 - `pnpm test:e2e` — builds, starts all apps, runs Playwright smoke tests (needs `docker compose up -d`)
 
 ## Getting code into main
-The user reviews and merges every PR on GitHub; nothing reaches `main` otherwise. Rules: `.cursor/rules/guardrails.mdc`.
+The user reviews and merges every PR on GitHub; nothing reaches `main` otherwise. A GitHub ruleset ("Protect main") enforces it on the server: PR required, CI must pass, no force push, no bypass. Rules: `.cursor/rules/guardrails.mdc`.
 
 ## Pitfalls
 - A shell hook (`.cursor/hooks.json`) enforces `.cursor/rules/guardrails.mdc`. If a command is blocked, don't work around it; ask the user.
-- The hook reads the branch when the command runs, so `git switch -c x && git commit` is still judged as being on the old branch. Run the switch on its own first.
+- The hook reads the branch before a command runs, so it blocks a branch switch chained with a commit, merge, or push (`git switch -c x && git commit`). Run the switch on its own first.
 - ESM everywhere: relative imports end in `.js` in `apps/api`, `apps/worker`, `packages/shared`.
 - After changing `packages/shared`, it rebuilds automatically under `pnpm dev`; otherwise run `pnpm --filter @job-assistant/shared build`.
 - Postgres is on host port 5433, not 5432 (a native PostgreSQL may own 5432).

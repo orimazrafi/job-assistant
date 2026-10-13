@@ -45,11 +45,35 @@ describe('guard-shell rules', () => {
     });
   });
 
+  it('closes the bypasses that reach main from a card branch', () => {
+    const onCard = { branch: 'card/001-01' };
+    expectAll('deny', [
+      // switch chained with commit/merge/push: the hook only saw the card branch
+      'git switch main && git merge card/001-01 && git push',
+      'git checkout main; git commit -m "x"',
+      'git switch main\ngit push',
+      'git switch -c card/x && git commit -m "x"',
+      // other ways to name or include main
+      'git push --all',
+      'git push origin --all',
+      'git push --mirror',
+      'git push origin HEAD:refs/heads/main',
+      'git push origin +refs/heads/main',
+      'git push origin --delete main',
+      // global options before the subcommand
+      'git -C . push origin main',
+      'git -c user.name=x push origin HEAD:main',
+      'git --no-pager push --all',
+    ], onCard);
+    expectAll('deny', ['git -C . commit -m "x"', 'git --no-pager merge card/x'], { branch: 'main' });
+  });
+
   it('allows the card-branch flow: commit, push, and open a PR without asking', () => {
     const onCard = { branch: 'card/001-01' };
     expectAll('allow', ['git switch -c card/001-01', 'git diff --stat', 'git pull', 'gh pr view 12'], onCard);
     expectAll('allow', ['git commit -m "feat(001-01): users table"', 'git push -u origin card/001-01'], onCard);
-    expectAll('allow', ['gh pr create --fill --base main'], onCard);
+    expectAll('allow', ['gh pr create --fill --base main', 'git push origin card/001-01:refs/heads/card/001-01'], onCard);
+    expectAll('allow', ['git switch main', 'git checkout -b card/001-02', 'git switch main && git pull'], onCard);
     expectAll('allow', ['git push origin card/main-page', 'git push origin main-fix'], { branch: 'card/main-page' });
   });
 

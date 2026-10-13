@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Guardrails
 
-A shell hook (`.cursor/hooks/guard-shell.mjs`) enforces the most dangerous of these. Rules still apply where the hook cannot see.
+A shell hook (`.cursor/hooks/guard-shell.mjs`) enforces the most dangerous of these, and a GitHub ruleset on `main` refuses direct pushes. Rules still apply where neither can see.
 
 Never:
 - Change a database schema or data by hand (psql, mongosh, redis-cli writes). Schema changes go through migrations; data changes go through app code or seed scripts.
