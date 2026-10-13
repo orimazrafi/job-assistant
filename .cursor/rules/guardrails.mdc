@@ -13,10 +13,17 @@ Never:
 - Run destructive commands: `docker compose down -v`, `docker volume rm/prune`, `git reset --hard`, `git push --force`, `git clean -f`, `git branch -D`, dropping databases/tables, `FLUSHALL`.
 - Read, print, or edit `.env` or any secret; use `.env.example` instead.
 - Weaken, skip, or delete tests to make them pass.
+- Commit, merge, or push on `main`, or merge a PR (`gh pr merge`). Only the user merges, on GitHub.
+
+Code review gate (the user approves all code that goes in):
+- Work on a branch per task card, e.g. `card/001-01`. Create it as a separate command before editing.
+- Before `git commit`: show the user a short summary of what changed and why, plus `git diff --stat`. Then run the commit; the hook asks the user to approve it.
+- After a commit is approved: ask before pushing the branch and opening a PR (`gh pr create`).
+- After the user merges on GitHub: `git switch main` and `git pull`.
 
 Ask the user first:
 - Running E2E tests (`pnpm test:e2e`, `playwright test`): they build and start all apps on ports 3000/4173.
-- `git push`, opening PRs, or anything that leaves this machine.
+- `git commit`, `git push`, opening PRs, or anything that leaves this machine.
 - Opening a database client (psql, mongosh, redis-cli), even read-only.
 - Installing global tools, starting/stopping Docker or system services, killing processes the agent didn't start.
 - Adding a dependency, or changing CI, Docker, or tooling config outside the task card.

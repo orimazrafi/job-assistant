@@ -1,6 +1,22 @@
-// Cursor beforeShellExecution hook: reads { command } JSON on stdin and answers
+// Cursor beforeShellExecution hook: reads { command, cwd } JSON on stdin and answers
 // allow / deny / ask on stdout. Policy lives in guard-shell-rules.mjs.
+import { execFileSync } from 'node:child_process';
 import { evaluate } from './guard-shell-rules.mjs';
+
+/** Returns the current git branch in `cwd`, or undefined outside a repo or on a detached HEAD. */
+function currentBranch(cwd) {
+  try {
+    const branch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
+      cwd: cwd || undefined,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+      timeout: 3000,
+    }).trim();
+    return branch && branch !== 'HEAD' ? branch : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 /** Builds the hook response for a decision; messages explain the block to the user and agent. */
 function toResponse(decision) {
@@ -34,7 +50,8 @@ let answered = false;
 function respond(input) {
   if (answered) return;
   answered = true;
-  const response = toResponse(evaluate(String(input.command ?? '')));
+  const cwd = typeof input.cwd === 'string' ? input.cwd : undefined;
+  const response = toResponse(evaluate(String(input.command ?? ''), { branch: currentBranch(cwd) }));
   process.stdout.write(JSON.stringify(response), () => process.exit(0));
 }
 

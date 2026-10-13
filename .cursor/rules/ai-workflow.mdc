@@ -6,13 +6,15 @@ alwaysApply: true
 # AI workflow
 
 Task size:
-- One task card = one chat session = one commit. Target 30–90 minutes of work.
+- One task card = one chat session = one branch, one commit, one PR. Target 30–90 minutes of work.
 - A task card has: Spec link, Files, Do, Don't, Done when (see `docs/tasks/_template.md`).
 - If a task grows beyond its card, stop and propose splitting it.
 
 Context hygiene:
 - Reference exact files (`@path`) instead of scanning the whole repo.
 - Specs, ADRs, and feature docs are the memory. Chat history is not.
+- One source of truth: each rule or fact lives in one file (see the "Where things go" table in `AGENTS.md`). Elsewhere, link to it instead of restating it.
+- When you find a duplicate, keep the copy in the right place and replace the others with a link. `docs/progress.md` and ADRs are snapshots and may restate.
 - Before ending a session, use the `handoff` skill to update `docs/progress.md`.
 - If the session repeats mistakes or contradicts earlier decisions, recommend starting a fresh chat.
 
