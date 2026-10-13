@@ -8,6 +8,7 @@ alwaysApply: false
 
 PostgreSQL (source of truth, relational data):
 - Every schema change is a new migration file. Forbidden actions (manual DB changes, editing applied migrations) are in `guardrails.mdc`.
+- Migrations are plain SQL in `apps/api/migrations/` ([ADR 006](../../docs/adr/006-migrations-node-pg-migrate.md)). Every migration has a working `-- Down Migration`, covered by an integration test.
 - snake_case tables/columns, `id uuid`, `created_at`/`updated_at timestamptz`.
 - Unique constraints enforce invariants (e.g. `(source, external_id)` on jobs).
 - Parameterized queries only; never interpolate strings into SQL.

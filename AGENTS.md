@@ -20,6 +20,8 @@ Roles (product-manager, architect, qa-engineer, backend-dev, frontend-dev, code-
 ## Commands
 Requires Node 24+, pnpm 12, Docker. First time: `cp .env.example .env && pnpm install`.
 - `docker compose up -d` — Postgres (host port 5433), MongoDB, Redis
+- `pnpm db:migrate` — apply pending Postgres migrations (run after pulling; the API does not migrate on startup)
+- `pnpm --filter @job-assistant/api db:migration:new <name>` — create an SQL migration in `apps/api/migrations/`
 - `pnpm dev` — API :3000, worker, web :5173 (status page)
 - `pnpm lint` / `pnpm typecheck`
 - `pnpm test` — unit tests (all apps)

@@ -16,7 +16,8 @@
     "test": "pnpm -r test && pnpm test:hooks",
     "test:hooks": "node --test \".cursor/hooks/*.test.mjs\"",
     "test:int": "pnpm -r test:int",
-    "test:e2e": "pnpm build && playwright test"
+    "test:e2e": "pnpm build && playwright test",
+    "db:migrate": "pnpm --filter @job-assistant/api db:migrate"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

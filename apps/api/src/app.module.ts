@@ -5,6 +5,7 @@ import { validateEnv, type Env } from './config/env.js';
 import { HealthModule } from './health/health.module.js';
 import { InfraModule } from './infra/infra.module.js';
 import { SystemModule } from './system/system.module.js';
+import { UsersModule } from './users/users.module.js';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SystemModule } from './system/system.module.js';
     InfraModule,
     HealthModule,
     SystemModule,
+    UsersModule,
   ],
 })
 export class AppModule {}
