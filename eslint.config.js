@@ -11,6 +11,14 @@ export default defineConfig(
   js.configs.recommended,
   tseslint.configs.recommended,
   {
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_' },
+      ],
+    },
+  },
+  {
     files: ['apps/api/**', 'apps/worker/**', 'packages/**', 'e2e/**', '*.{js,ts}'],
     languageOptions: { globals: globals.node },
   },
