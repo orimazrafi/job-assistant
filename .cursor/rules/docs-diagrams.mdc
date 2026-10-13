@@ -1,0 +1,22 @@
+---
+description: Every feature is documented with Mermaid diagrams so it can be understood without reading code
+alwaysApply: true
+---
+
+# Feature docs and diagrams
+
+Any task that adds or changes a feature MUST create or update `docs/features/<feature>.md`
+using `docs/features/_template.md`. The doc must be readable in ~2 minutes.
+
+Required in every feature doc:
+- TL;DR (max 3 lines): what it does and why.
+- At least one Mermaid diagram: `flowchart` for data flow, `sequenceDiagram` for request flows.
+- `erDiagram` when Postgres tables or Mongo collections change.
+- "Key decisions" linking ADRs in `docs/adr/`.
+
+If the system shape changes (new app, store, queue, or external service), update `docs/architecture.md`.
+
+Mermaid hygiene:
+- Wrap labels containing `()`, `/`, `:` or `"` in quotes: `A["POST /events (ingest)"]`.
+- Max ~12 nodes per diagram; split into two diagrams instead of one huge one.
+- Diagrams describe what the code does now, not wishes. Update them in the same commit as the code.

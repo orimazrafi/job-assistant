@@ -1,0 +1,15 @@
+---
+description: BullMQ job conventions for workers
+globs: apps/worker/**
+alwaysApply: false
+---
+
+# Queue jobs (BullMQ on Redis)
+
+- Every job is idempotent: running it twice with the same payload has the same result.
+- Payloads carry IDs and small params, never full objects or large text.
+- Use explicit `jobId` for dedupe where a job must not be enqueued twice.
+- Configure `attempts` + exponential backoff; permanently failed jobs are kept for inspection.
+- External calls (job sources, LLM) have timeouts and per-source rate limits in Redis.
+- One processor per file: `<queue-name>.processor.ts`, logic delegated to a service.
+- Log job id, queue, attempt, and duration on completion and failure.

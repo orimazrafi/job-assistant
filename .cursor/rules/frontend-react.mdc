@@ -1,0 +1,22 @@
+---
+description: React frontend architecture and conventions
+globs: apps/web/**
+alwaysApply: false
+---
+
+# React frontend
+
+Folders:
+- `pages/` route-level composition only.
+- `features/<name>/` domain UI, React Query hooks, query keys.
+- `components/` reusable presentational UI. No fetching.
+- `api/` HTTP client and types. No React imports.
+- `hooks/` shared hooks (`useX`).
+
+Rules:
+- Functional components and hooks only.
+- Server state lives in React Query; local UI state in `useState`. No global store unless proven needed.
+- All requests use `credentials: 'include'` and send the CSRF header on mutations. Never store tokens in localStorage.
+- Short comment on every component and hook: what it renders / what state and side effects it owns.
+- Semantic HTML, labels on inputs, keyboard-accessible interactions.
+- No premature memoization; optimize only after measuring.

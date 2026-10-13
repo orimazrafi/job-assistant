@@ -1,0 +1,15 @@
+---
+description: Testing conventions for unit, integration, and e2e tests
+globs: **/*.spec.ts,**/*.test.ts,**/*.test.tsx,**/e2e/**
+alwaysApply: false
+---
+
+# Testing
+
+- Unit tests (Jest/Vitest): services and pure helpers; mock repositories and external clients.
+- Integration tests: real Postgres, MongoDB, Redis via Testcontainers. No mocks for our own DB code.
+- E2E (Playwright): critical user journeys only (login, see matches, track application).
+- Test names describe behavior: `it('rejects an expired session')`.
+- Cover failure paths: timeouts, duplicates, retries, invalid input, unauthorized access.
+- Never weaken or delete a test to make it pass; fix the code or flag the spec.
+- External HTTP (job sources, LLM) is stubbed with recorded fixtures.

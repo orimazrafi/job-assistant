@@ -1,0 +1,21 @@
+---
+description: PostgreSQL and MongoDB data conventions
+globs: apps/api/**/*.repository.ts,apps/worker/**/*.repository.ts,**/migrations/**,**/schemas/**
+alwaysApply: false
+---
+
+# Data stores
+
+PostgreSQL (source of truth, relational data):
+- Every schema change is a migration. Never edit an applied migration.
+- snake_case tables/columns, `id uuid`, `created_at`/`updated_at timestamptz`.
+- Unique constraints enforce invariants (e.g. `(source, external_id)` on jobs).
+- Parameterized queries only; never interpolate strings into SQL.
+
+MongoDB (raw / flexible / append-heavy data):
+- Raw source payloads and AI generation history only. No data the app must join on.
+- Every collection has an explicit index list and, where useful, a TTL index.
+
+Both:
+- Repositories return domain types, not driver objects.
+- Changes to tables/collections must update the `erDiagram` in the feature doc.

@@ -1,0 +1,18 @@
+---
+description: Core project conventions for every task
+alwaysApply: true
+---
+
+# Core conventions
+
+- Start each session by reading `docs/progress.md` and the spec or task card you were given.
+- Work on ONE task card at a time. Do not touch files outside its scope.
+- Minimal diffs: change only what the task requires. No drive-by refactors.
+- Short comment on every function: purpose, non-obvious inputs/outputs, side effects.
+- No new dependency without stating why in the PR/commit message.
+- Every behavior change ships with tests; run them before declaring the task done.
+- The app must start and the E2E smoke test must pass after every task. Never leave `main` broken.
+- Build features as vertical slices (DB → API → UI → test) so something works end to end after each slice.
+- Config comes from env (validated at startup). Never commit secrets.
+- TypeScript strict mode. No `any` unless justified in a comment.
+- If the spec is unclear or wrong, stop and ask instead of guessing.

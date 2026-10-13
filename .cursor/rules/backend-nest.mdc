@@ -1,0 +1,30 @@
+---
+description: NestJS backend architecture and conventions
+globs: apps/api/**,apps/worker/**,packages/shared/**
+alwaysApply: false
+---
+
+# NestJS backend
+
+Layers:
+- Controllers: validate DTO (class-validator), call one service method, map response/status. No logic.
+- Services: business logic and use cases only. No raw SQL or Mongo calls.
+- Repositories: all DB access. Parameterized queries only.
+- Providers are wired in modules (composition root). Never `new` a repository or client inside a service.
+
+Errors:
+- Throw typed domain errors (`JobNotFoundError`), map to HTTP in a global exception filter.
+- Never leak stack traces or internal messages in responses.
+
+Structure (one responsibility per file):
+```
+apps/api/src/<feature>/
+  <feature>.module.ts
+  <feature>.controller.ts
+  <feature>.service.ts
+  <feature>.repository.ts
+  dto/
+  <feature>.service.spec.ts
+```
+
+Config: `@nestjs/config` with a validated schema; fail fast on missing env vars.

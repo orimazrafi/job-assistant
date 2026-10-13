@@ -1,0 +1,23 @@
+---
+description: Authentication, session cookie, and web security rules
+globs: apps/api/src/auth/**,apps/api/src/main.ts,apps/web/src/features/auth/**,apps/web/src/api/**
+alwaysApply: false
+---
+
+# Auth and security
+
+Sessions (see docs/adr/003-server-side-sessions.md):
+- Server-side sessions in Redis; the browser only holds a random session id.
+- Cookie: `__Host-sid`, `HttpOnly; Secure; SameSite=Lax; Path=/`. No `Domain`.
+- Rotate the session id on every login. Logout deletes the Redis session.
+- Idle timeout 7 days, absolute max 30 days.
+
+SSO (OIDC, Authorization Code + PKCE):
+- Validate `state`, `nonce`, ID token signature, `iss`, `aud`, `exp`.
+- Link an SSO identity to an existing account only if the provider marks the email verified.
+
+Passwords: argon2id. Rate-limit `/auth/*` per IP and per account in Redis.
+
+Web: CSRF token on POST/PUT/PATCH/DELETE + `Origin` check; CORS allows only the web origin with credentials; `helmet` on.
+
+Never: tokens in localStorage, JWTs as sessions, logging passwords/tokens/cookies.

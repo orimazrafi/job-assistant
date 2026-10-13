@@ -1,0 +1,20 @@
+---
+description: How AI sessions are sized, scoped, and handed off to keep context small
+alwaysApply: true
+---
+
+# AI workflow
+
+Task size:
+- One task card = one chat session = one commit. Target 30–90 minutes of work.
+- A task card has: Spec link, Files, Do, Don't, Done when (see `docs/tasks/_template.md`).
+- If a task grows beyond its card, stop and propose splitting it.
+
+Context hygiene:
+- Reference exact files (`@path`) instead of scanning the whole repo.
+- Specs, ADRs, and feature docs are the memory. Chat history is not.
+- Before ending a session, use the `handoff` skill to update `docs/progress.md`.
+- If the session repeats mistakes or contradicts earlier decisions, recommend starting a fresh chat.
+
+Decisions:
+- Any choice that is hard to reverse (store, library, auth model, data shape) gets an ADR.
