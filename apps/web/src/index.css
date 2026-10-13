@@ -1,0 +1,56 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #1f2933;
+  background: #f5f7fa;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  max-width: 40rem;
+  margin: 3rem auto;
+  padding: 0 1rem;
+}
+
+section {
+  background: #fff;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+}
+
+.badge {
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+}
+
+.badge-up {
+  color: #0b6b3a;
+  background: #d9f5e5;
+}
+
+.badge-down {
+  color: #9b1c1c;
+  background: #fde2e2;
+}
+
+button {
+  font: inherit;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+}
