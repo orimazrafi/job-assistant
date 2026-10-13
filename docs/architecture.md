@@ -47,20 +47,24 @@ flowchart LR
     M -->|"yes"| NT["notify user"]
 ```
 
-## Monorepo layout (planned)
+## Monorepo layout
 
 ```
-apps/api       NestJS REST API
-apps/worker    NestJS BullMQ workers
-apps/web       React + Vite
-packages/shared  shared types/DTOs
+apps/api         NestJS REST API (ESM, port 3000, prefix /api)
+apps/worker      NestJS BullMQ workers (no HTTP)
+apps/web         React + Vite (port 5173, proxies /api to the API)
+packages/shared  shared types, queue names, job payloads
+e2e/             Playwright smoke tests
 ```
+
+Toolchain and testing levels: [ADR 005](adr/005-toolchain.md).
 
 ## Features
 
 | Feature | Spec | Design doc | Status |
 |---|---|---|---|
-| Auth (email + Google/LinkedIn SSO) | [001](specs/001-auth.md) | [auth](features/auth.md) | Designed |
+| Platform health (walking skeleton) | [000](specs/000-walking-skeleton.md) | [platform-health](features/platform-health.md) | Done |
+| Auth (email + Google SSO, LinkedIn optional) | [001](specs/001-auth.md) | [auth](features/auth.md) | Designed |
 | Job fetching | [002](specs/002-job-fetching.md) | — | Spec |
 | Relevance scoring | — | — | Planned |
 | Dashboard + application tracker | — | — | Planned |

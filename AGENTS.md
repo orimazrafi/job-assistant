@@ -29,4 +29,14 @@ Finds relevant software jobs in central Israel, scores them against the user's C
 6. `handoff` updates docs/progress.md before the session ends.
 
 ## Commands
-Not scaffolded yet. Planned: `docker compose up -d`, `pnpm dev`, `pnpm test`, `pnpm test:e2e`, `pnpm lint`, `pnpm typecheck`.
+Requires Node 24+, pnpm 12, Docker. First time: `cp .env.example .env && pnpm install`.
+- `docker compose up -d` — Postgres (host port 5433), MongoDB, Redis
+- `pnpm dev` — API :3000, worker, web :5173 (status page)
+- `pnpm lint` / `pnpm typecheck`
+- `pnpm test` — unit tests (all apps)
+- `pnpm test:int` — integration tests with Testcontainers (Docker must be running)
+- `pnpm test:e2e` — builds, starts all apps, runs Playwright smoke tests (needs `docker compose up -d`)
+
+## Conventions worth knowing
+- ESM everywhere: relative imports end in `.js` in `apps/api`, `apps/worker`, `packages/shared`.
+- After changing `packages/shared`, it rebuilds automatically under `pnpm dev`; otherwise run `pnpm install` or `pnpm --filter @job-assistant/shared build`.
