@@ -9,7 +9,9 @@
     "start": "node dist/main.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "test:int": "vitest run --config vitest.int.config.ts"
+    "test:int": "vitest run --config vitest.int.config.ts",
+    "db:migrate": "node --env-file-if-exists=../../.env node_modules/node-pg-migrate/bin/node-pg-migrate.js up -m migrations",
+    "db:migration:new": "node-pg-migrate create -m migrations -j sql"
   },
   "dependencies": {
     "@job-assistant/shared": "workspace:*",
@@ -21,6 +23,7 @@
     "bullmq": "^6.3.13",
     "ioredis": "^6.0.0",
     "mongodb": "^7.7.0",
+    "node-pg-migrate": "^9.0.0",
     "pg": "^8.23.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
