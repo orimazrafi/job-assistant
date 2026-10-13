@@ -1,6 +1,7 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module.js';
 import { validateEnv, type Env } from './config/env.js';
 import { HealthModule } from './health/health.module.js';
 import { InfraModule } from './infra/infra.module.js';
@@ -26,6 +27,7 @@ import { UsersModule } from './users/users.module.js';
     HealthModule,
     SystemModule,
     UsersModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

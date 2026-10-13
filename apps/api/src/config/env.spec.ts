@@ -18,6 +18,18 @@ describe('validateEnv', () => {
     expect(validateEnv({ ...validEnv, API_PORT: '4000' }).API_PORT).toBe(4000);
   });
 
+  it('defaults sessions to 7 days idle and 30 days total', () => {
+    const env = validateEnv(validEnv);
+    expect(env.SESSION_IDLE_TTL_SECONDS).toBe(7 * 24 * 3600);
+    expect(env.SESSION_ABSOLUTE_TTL_SECONDS).toBe(30 * 24 * 3600);
+  });
+
+  it('rejects an absolute session limit shorter than the idle timeout', () => {
+    expect(() =>
+      validateEnv({ ...validEnv, SESSION_IDLE_TTL_SECONDS: '600', SESSION_ABSOLUTE_TTL_SECONDS: '60' }),
+    ).toThrow(/SESSION_ABSOLUTE_TTL_SECONDS/);
+  });
+
   it('rejects a missing variable with its name in the message', () => {
     const { REDIS_URL: _omitted, ...withoutRedis } = validEnv;
     expect(() => validateEnv(withoutRedis)).toThrow(/REDIS_URL/);

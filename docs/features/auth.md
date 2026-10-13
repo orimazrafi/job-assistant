@@ -1,6 +1,6 @@
 # Feature: Authentication
 
-**Status:** In progress (`users` table and repository done; no endpoints yet)
+**Status:** In progress (`users` table, Redis sessions, and `GET /api/auth/me` done; no login yet)
 **Spec:** [001](../specs/001-auth.md) · **Tasks:** [001](../tasks/001-auth.md)
 
 ## TL;DR
@@ -11,11 +11,13 @@ Users sign in with email/password, Google, or LinkedIn. The API keeps the sessio
 ```mermaid
 flowchart LR
     B["Browser"] -->|"__Host-sid cookie"| G["SessionGuard"]
-    G -->|"lookup sess:id"| R[("Redis")]
-    G -->|"valid"| C["Controller"]
-    G -->|"missing or expired"| E["401"]
-    C --> S["Service"] --> P[("Postgres users")]
+    G -->|"GET sess:id"| R[("Redis")]
+    G -->|"valid: touch, set req.auth"| C["GET /api/auth/me"]
+    G -->|"missing, expired, or revoked"| E["401 + clear cookie"]
+    C --> S["AuthService"] --> P[("Postgres users")]
 ```
+
+A session ends after 7 days without use or 30 days after login, whichever comes first (`SESSION_IDLE_TTL_SECONDS`, `SESSION_ABSOLUTE_TTL_SECONDS`). Every request through the guard restarts the idle timer, never past the 30-day limit.
 
 ## SSO login step by step (Google / LinkedIn)
 
@@ -85,8 +87,8 @@ erDiagram
 ```
 
 Redis keys:
-- `sess:<id>` → `{ userId, createdAt, lastSeenAt }`, TTL = idle timeout
-- `user-sessions:<userId>` → set of session ids (for logout-all)
+- `sess:<id>` → `{ userId, createdAt, lastSeenAt }`, TTL = idle timeout capped by the remaining absolute lifetime (built)
+- `user-sessions:<userId>` → set of session ids (for logout-all, card 001-05)
 - `oidc:<state>` → `{ nonce, verifier, provider }`, TTL 5 min
 - `rl:login:ip:<ip>`, `rl:login:acct:<email>` → failure counters, TTL 15 min
 
@@ -99,13 +101,14 @@ Unique constraint: `(provider, provider_user_id)` on `user_identities`.
 - Schema changes as plain SQL migrations with node-pg-migrate — [ADR 006](../adr/006-migrations-node-pg-migrate.md)
 
 ## Failure handling
-- Expired/unknown session → 401 → React redirects to `/login`.
+- Missing, expired, unknown, or revoked session → 401 with a generic message; a dead cookie is cleared. React will redirect to `/login` (card 001-04).
+- Session whose account was deleted → session destroyed, 401.
 - Invalid `state` or `nonce` on callback → 400, no session created.
 - Provider email not verified and email already exists → refuse to link, show message.
 - Rate limit exceeded → 429 with `Retry-After`.
 
-## Where the code lives (planned)
-- `apps/api/src/auth/` — controllers, services, guard, OIDC client, session store
+## Where the code lives
+- `apps/api/src/auth/` — `SessionStore`, `SessionGuard`, cookie helpers, `@CurrentUser()`, `GET /auth/me` (built); login endpoints and OIDC client (planned)
 - `apps/api/src/users/` — `UsersRepository` (built), identities repository (planned)
 - `apps/api/migrations/` — SQL migrations
 - `apps/web/src/features/auth/` — `useAuth`, login page, protected route

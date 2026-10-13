@@ -23,7 +23,7 @@ Each card = one chat session = one commit (30–90 min). The app must start afte
 - **Don't:** implement login.
 - **Done when:** tests for valid, missing, expired, revoked sessions pass.
 - **Verify:** `curl -i http://localhost:3000/api/auth/me` returns 401.
-- **Status:** todo
+- **Status:** done (also built idle 7 d and absolute 30 d expiry, needed for the "expired" tests)
 
 ### 001-03: Sign-up, login, logout endpoints
 - **Files:** `apps/api/src/auth/password-auth.*`
@@ -43,9 +43,9 @@ Each card = one chat session = one commit (30–90 min). The app must start afte
 
 ## Slice B — Session safety
 
-### 001-05: Expiry and logout of all devices
-- **Do:** idle (7 d) and absolute (30 d) expiry, `POST /api/auth/logout-all`, button in UI.
-- **Done when:** tests for both expiries and logout-all pass; E2E still green.
+### 001-05: Logout of all devices
+- **Do:** `user-sessions:<userId>` index in Redis, `POST /api/auth/logout-all`, button in UI. (Idle and absolute expiry shipped in 001-02.)
+- **Done when:** tests for logout-all pass; E2E still green.
 - **Verify:** log in in two browsers, click "log out everywhere", both are logged out.
 - **Status:** todo
 

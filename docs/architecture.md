@@ -64,7 +64,7 @@ Toolchain and testing levels: [ADR 005](adr/005-toolchain.md).
 | Feature | Spec | Design doc | Status |
 |---|---|---|---|
 | Platform health (walking skeleton) | [000](specs/000-walking-skeleton.md) | [platform-health](features/platform-health.md) | Done |
-| Auth (email + Google SSO, LinkedIn optional) | [001](specs/001-auth.md) | [auth](features/auth.md) | Designed |
+| Auth (email + Google SSO, LinkedIn optional) | [001](specs/001-auth.md) | [auth](features/auth.md) | In progress |
 | Job fetching | [002](specs/002-job-fetching.md) | — | Spec |
 | Relevance scoring | — | — | Planned |
 | Dashboard + application tracker | — | — | Planned |
