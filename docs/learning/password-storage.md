@@ -25,6 +25,8 @@ $argon2id$v=19$m=19456,t=2,p=1$ZnWhb00AnnVOFcI6AZ2Ipg$rF5TevMtfupNk8/S6Vw/Qu7dvv
  algorithm  version  memory KiB, passes, lanes   salt (base64)          hash (base64)
 ```
 
+The salt is random only once, at sign-up. Login doesn't make a new one: `verify` reads the salt and parameters from the stored string, hashes the typed password with them, and compares. A new salt appears only when a new hash is created (sign-up or a password change).
+
 Because the parameters live inside each hash, we can raise the cost later: old hashes still verify with their own parameters, and on a successful login we can rehash with the new cost (`parseOptions` in `@node-rs/argon2` shows the old ones).
 
 **The algorithms, oldest to newest**
