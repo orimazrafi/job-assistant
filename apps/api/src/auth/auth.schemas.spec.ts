@@ -1,5 +1,7 @@
+// The schemas live in packages/shared (the web form uses them too); they are tested here because
+// the API is where they are enforced and packages/shared has no test runner.
+import { loginSchema, signupSchema } from '@job-assistant/shared';
 import { describe, expect, it } from 'vitest';
-import { loginSchema, signupSchema } from './auth.schemas.js';
 
 describe('signupSchema', () => {
   it('accepts a valid body and trims the email', () => {
@@ -9,16 +11,22 @@ describe('signupSchema', () => {
     });
   });
 
-  it('rejects a password shorter than 10 characters', () => {
-    expect(signupSchema.safeParse({ email: 'dana@example.com', password: 'nine char' }).success).toBe(false);
+  it('rejects a password shorter than 10 characters with a readable message', () => {
+    const result = signupSchema.safeParse({ email: 'dana@example.com', password: 'nine char' });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toBe('Use at least 10 characters');
   });
 
   it('rejects a password longer than 128 characters', () => {
     expect(signupSchema.safeParse({ email: 'dana@example.com', password: 'x'.repeat(129) }).success).toBe(false);
   });
 
-  it('rejects an invalid email', () => {
-    expect(signupSchema.safeParse({ email: 'not-an-email', password: 'long enough password' }).success).toBe(false);
+  it('rejects an invalid email with a readable message', () => {
+    const result = signupSchema.safeParse({ email: 'not-an-email', password: 'long enough password' });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toBe('Enter a valid email address');
   });
 });
 

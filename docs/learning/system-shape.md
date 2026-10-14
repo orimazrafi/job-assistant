@@ -29,7 +29,7 @@ flowchart LR
 **Message contracts evolve:** types are compile-time only, and queued jobs are JSON written by old code. Make changes backward compatible (optional field first, deploy consumers before producers, then make it required: expand and contract), or version the job name, and validate payloads at runtime.
 
 ## In this project
-- `apps/api` (HTTP) and `apps/worker` (Nest application context, no HTTP) share `packages/shared` (`QUEUES`, job payload types, API response types; the web app imports types only). See [architecture](../architecture.md) and [ADR 005](../adr/005-toolchain.md).
+- `apps/api` (HTTP) and `apps/worker` (Nest application context, no HTTP) share `packages/shared` (`QUEUES`, job payload types, API response types, and since card 001-04 the zod request schemas, which the web app's forms also use). See [architecture](../architecture.md) and [ADR 005](../adr/005-toolchain.md).
 - Producer: `apps/api/src/system/system.service.ts` (`queue.add`). Consumer: `apps/worker/src/system/system.processor.ts` (`@Processor`, `process`).
 - Known gap: the ping processor trusts `job.data as PingJobData`; real jobs (job fetching) should validate payloads with zod.
 - Walking skeleton: [spec 000](../specs/000-walking-skeleton.md).

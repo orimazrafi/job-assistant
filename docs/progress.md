@@ -1,31 +1,29 @@
 # Progress
 
 ## Current focus
-Card 001-03 (sign-up, login, logout API) on branch `card/001-03`, in review. Next: 001-04 (login UI and E2E journey). Repo: https://github.com/orimazrafi/job-assistant.
+Card 001-04 (login UI and E2E journey) on branch `card/001-04`, in review. Slice A (email account) is complete once it merges. Next: 001-05 (logout of all devices). Repo: https://github.com/orimazrafi/job-assistant.
 
 ## Done recently
-- 001-03: `POST /api/auth/signup` (201, or 409 for a taken email), `POST /api/auth/login` (200, or the same 401 for every bad credential, with a dummy hash for equal timing), `POST /api/auth/logout` (always 204). argon2id via `@node-rs/argon2`; a new session id on every sign-in; `ZodValidationPipe` for request bodies. Notes: `docs/learning/password-storage.md`.
-- 000-06 ([PR #6](https://github.com/orimazrafi/job-assistant/pull/6)): Bull Board queue dashboard at `/api/queues` (opt-in flag, never in production).
-- Learning workflow ([PR #5](https://github.com/orimazrafi/job-assistant/pull/5)): decision briefs, code tours, quizzes, ADR "Interview angle", notebook in `docs/learning/` with a 9-lesson catch-up path. Lesson 1 (system shape) done.
-- Tests: 61 unit (API 52), 8 hook-rule groups, 32 integration.
+- 001-04: React Router pages (`/` protected home, `/login`, `/signup`, `/status` public), auth state in the React Query cache of `/auth/me`, `ProtectedRoute` / `GuestRoute` redirects with a safe `?next`, react-hook-form with the shared zod schemas (moved to `packages/shared`), Playwright journey `e2e/auth.spec.ts`; CI's E2E job now runs `pnpm db:migrate`. Notes: `docs/learning/frontend-auth-routing.md`.
+- 001-03 ([PR #7](https://github.com/orimazrafi/job-assistant/pull/7)): sign-up, login, logout endpoints; argon2id; session rotation; `ZodValidationPipe`. Quiz done (weak spots: offline vs online attacks, fixation vs hijacking; added to the notebook).
+- 000-06 ([PR #6](https://github.com/orimazrafi/job-assistant/pull/6)): Bull Board queue dashboard (opt-in flag, never in production).
+- Tests: 81 unit (API 52, web 25, worker 4), 8 hook-rule groups, 32 integration, 4 E2E.
 
 ## Decisions made
-- [ADR 007](adr/007-password-hashing-argon2id.md): argon2id (m=19456, t=2, p=1) with `@node-rs/argon2` (prebuilt binaries, no install script to allow).
-- [ADR 008](adr/008-request-validation-zod-pipe.md): zod schemas in a small Nest pipe, checked against shared types with `satisfies`.
-- Sign-up returns 409 for a taken email (accepted enumeration trade-off; login never reveals it). Rate limits in 001-06 reduce harvesting.
-- Earlier: ADRs [001](adr/001-postgres-plus-mongodb.md)–[006](adr/006-migrations-node-pg-migrate.md); queue dashboard is a fail-closed flag; the user wants the why and alternatives of every decision (`.cursor/rules/learning.mdc`).
+- [ADR 009](adr/009-frontend-routing-auth-state-forms.md): React Router; React Query `['auth','me']` as the only auth state (401 = `null`); react-hook-form + shared zod schemas. `packages/shared` now ships zod, so it must stay browser-safe.
+- [ADR 007](adr/007-password-hashing-argon2id.md) argon2id via `@node-rs/argon2`; [ADR 008](adr/008-request-validation-zod-pipe.md) zod pipe; 409 on duplicate sign-up (accepted enumeration trade-off).
+- Earlier: ADRs [001](adr/001-postgres-plus-mongodb.md)–[006](adr/006-migrations-node-pg-migrate.md); the user wants the why and alternatives of every decision (`.cursor/rules/learning.mdc`).
 
 ## Open issues
-- Job payloads are trusted with `as` casts in the worker (`system.processor.ts`); job fetching should validate them with zod (the pipe pattern from ADR 008 fits).
-- CI's E2E job does not run `pnpm db:migrate` yet. Needed in card 001-04, when the browser E2E test signs up a user (CI change needs the user's approval).
-- Login and sign-up hash on every request (about 20–100 ms CPU depending on the machine, and 19 MiB each) and have no rate limit until 001-06.
-- The `Secure` session cookie works on `http://localhost` in Chromium and Firefox; check the E2E browser setup in card 001-04. curl does not store Secure cookies over http, so pass the cookie header by hand.
+- Job payloads are trusted with `as` casts in the worker (`system.processor.ts`); job fetching should validate them with zod (schemas can live in `packages/shared`).
+- Login and sign-up hash on every request and have no rate limit until 001-06.
+- No global 401 handler in the web app yet: only `/auth/me` notices an expired session. Add one when pages fetch user data (ADR 009, "At scale").
 - Local Postgres for this project is on host port **5433** (a native PostgreSQL 16 service uses 5432).
 - Confirm seed list of central-Israel companies for spec 002.
 
 ## Next steps
-1. 001-04: login UI and E2E journey (add `pnpm db:migrate` to CI's E2E job).
-2. 001-05: logout everywhere (`user-sessions:<userId>` set).
+1. 001-05: logout of all devices (`user-sessions:<userId>` set, `POST /api/auth/logout-all`, UI button).
+2. 001-06: CSRF, CORS, helmet, login rate limits.
 3. Learning: lesson 2 (data stores) whenever the user asks.
 
 ## Roadmap
@@ -33,7 +31,7 @@ Card 001-03 (sign-up, login, logout API) on branch `card/001-03`, in review. Nex
 - [x] Walking skeleton + CI (+ queue dashboard)
 - [x] Guardrails (rules + shell hook + review at PR merge + GitHub ruleset)
 - [x] Learning workflow (briefs, tours, quizzes, notebook)
-- [ ] Auth (001-01 to 001-03 done)
+- [ ] Auth (001-01 to 001-04 done: email accounts work end to end)
 - [ ] Job fetching
 - [ ] Relevance scoring
 - [ ] Dashboard + application tracker

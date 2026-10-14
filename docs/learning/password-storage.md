@@ -62,7 +62,7 @@ flowchart LR
 - `apps/api/src/auth/password-hasher.ts`: argon2id with m=19456, t=2, p=1 via `@node-rs/argon2`, plus `verifyDummy` for timing ([ADR 007](../adr/007-password-hashing-argon2id.md)).
 - `apps/api/src/auth/password-auth.service.ts`: sign-up and login. Unknown email, SSO-only account, and wrong password all give the same 401 after the same work.
 - `apps/api/src/auth/auth.service.ts`: `startSession` deletes the browser's old session and creates a new id (rotation).
-- `apps/api/src/http/zod-validation.pipe.ts` and `auth/auth.schemas.ts`: zod schemas checked against the shared types with `satisfies` ([ADR 008](../adr/008-request-validation-zod-pipe.md)).
+- `apps/api/src/http/zod-validation.pipe.ts` with the schemas in `packages/shared/src/auth.ts`, also used by the web form ([ADR 008](../adr/008-request-validation-zod-pipe.md), [ADR 009](../adr/009-frontend-routing-auth-state-forms.md)).
 - Sign-up returns 409 for a taken email: an accepted enumeration trade-off ([feature doc](../features/auth.md)).
 
 ## Alternatives
@@ -80,3 +80,5 @@ flowchart LR
 2. **"An attacker can tell which emails are registered. How, and how do you stop it?"** Covers: different messages, timing differences, the sign-up and password-reset flows, and rate limits.
 3. **"What is session fixation?"** Covers: a planted id, rotation on login and privilege change, and HttpOnly plus `__Host-` cookies.
 4. **"Why validate if you have TypeScript?"** Covers: types are erased at runtime, untrusted input, injection, and parsing at the boundary.
+5. **"argon2 slows down logins. Why not SHA-256 plus strict rate limits on `/login`?"** Covers: rate limits only protect the live endpoint (online attack); after a database leak the attacker cracks hashes on their own GPUs and never calls us (offline attack), so only a slow, salted hash helps. Use both.
+6. **"Session fixation vs session hijacking: what's the difference?"** Covers: hijacking steals an id after login (defense: HttpOnly, Secure, short lifetimes); fixation plants a known id before login and waits (defense: a new id at login). The order of events is the difference.

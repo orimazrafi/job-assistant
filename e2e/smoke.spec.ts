@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test';
 // It grows with every feature slice.
 
 test('status page shows every dependency up', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/status');
 
   await expect(page.getByText('Overall:')).toContainText('ok');
   for (const name of ['postgres', 'mongo', 'redis']) {
@@ -13,7 +13,7 @@ test('status page shows every dependency up', async ({ page }) => {
 });
 
 test('worker answers a ping through the queue', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/status');
 
   await page.getByRole('button', { name: 'Ping worker' }).click();
 

@@ -89,5 +89,5 @@ It can change jobs and has no login yet, so it is **fail-closed**: mounted only 
 - `apps/api/src/queue-dashboard/` — Bull Board, development only
 - `apps/api/src/infra/` — Postgres/Mongo/Redis clients (composition root)
 - `apps/worker/src/system/` — `SystemProcessor`, `PingService`
-- `apps/web/src/features/system/` — `HealthPanel`, `PingPanel`, hooks
+- `apps/web/src/features/system/` — `HealthPanel`, `PingPanel`, hooks; shown at `/status` (public, no login needed)
 - `e2e/smoke.spec.ts` — the end-to-end proof

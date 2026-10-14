@@ -1,6 +1,6 @@
 # Feature: Authentication
 
-**Status:** In progress (API for email sign-up, login, logout, and `GET /api/auth/me` done; no UI, rate limits, CSRF, or SSO yet)
+**Status:** In progress (email sign-up, login, logout: API and UI done; no logout-all, rate limits, CSRF, or SSO yet)
 **Spec:** [001](../specs/001-auth.md) · **Tasks:** [001](../tasks/001-auth.md)
 
 ## TL;DR
@@ -71,6 +71,40 @@ Sign-up (`POST /api/auth/signup`) is the same shape: validate (password 10–128
 
 Card 001-06 adds rate limits (IP and account failure counters in Redis) and CSRF protection in front of these endpoints.
 
+## In the browser
+
+JavaScript can't read the HttpOnly cookie, so the React app asks the API who is signed in and caches the answer in React Query under `['auth', 'me']` (`null` = signed out). Route guards redirect from that cached answer; forms never navigate themselves.
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant W as React app
+    participant A as NestJS API
+    U->>W: Open / (or refresh)
+    W->>A: GET /api/auth/me (cookie sent automatically)
+    alt 200 user
+        A-->>W: user
+        W-->>U: ProtectedRoute renders the home page
+    else 401
+        A-->>W: signed out (cached as null)
+        W-->>U: redirect to /login?next=page
+        U->>W: Submit email and password
+        W->>W: Shared zod schema checks the form
+        W->>A: POST /api/auth/login
+        A-->>W: 200 user + Set __Host-sid
+        W->>W: Store user in the cache
+        W-->>U: GuestRoute redirects to next page
+    end
+```
+
+| URL | Who can open it | Page |
+|---|---|---|
+| `/` | Signed in (else redirect to `/login`) | Home: "Signed in as …" and Log out |
+| `/login`, `/signup` | Signed out (else redirect to `?next` or `/`) | Email and password forms |
+| `/status` | Everyone | System status (dependency health, worker ping) |
+
+`?next` only accepts same-site paths (`/jobs`, not `//evil.com`), so a login link can't send users to another site (open redirect). Logout removes every cached query, so the next person on the same browser never sees the previous user's data. The cached user counts as fresh for a minute; after that, returning to the tab re-checks `/auth/me`, so an expired session is noticed.
+
 ## Data model
 
 ```mermaid
@@ -108,13 +142,15 @@ Unique constraint: `(provider, provider_user_id)` on `user_identities`.
 - Schema changes as plain SQL migrations with node-pg-migrate — [ADR 006](../adr/006-migrations-node-pg-migrate.md)
 - Passwords hashed with argon2id via `@node-rs/argon2` — [ADR 007](../adr/007-password-hashing-argon2id.md)
 - Request bodies validated with zod schemas in a Nest pipe — [ADR 008](../adr/008-request-validation-zod-pipe.md)
+- React Router, auth state in React Query, and forms validated with the same shared zod schemas — [ADR 009](../adr/009-frontend-routing-auth-state-forms.md)
 - Duplicate email at sign-up returns 409, which reveals that the email is registered. Accepted for usability; rate limits (card 001-06) slow down anyone harvesting emails this way. Login never reveals it.
 
 ## Failure handling
 - Malformed body (bad email, password too short or long, missing fields) → 400 `ValidationError` listing each problem.
 - Email already registered at sign-up → 409 `EmailTakenError`, no session.
 - Wrong password, unknown email, or SSO-only account at login → the same 401 "Invalid email or password", after the same hashing work.
-- Missing, expired, unknown, or revoked session → 401 with a generic message; a dead cookie is cleared. React will redirect to `/login` (card 001-04).
+- Missing, expired, unknown, or revoked session → 401 with a generic message; a dead cookie is cleared. React redirects to `/login`.
+- In the browser: invalid fields show the schema's message under the input before any request; API errors (401, 409, 500) show above the submit button. If `/auth/me` itself fails (API down), protected pages show the error instead of the login page.
 - Session whose account was deleted → session destroyed, 401.
 - Invalid `state` or `nonce` on callback → 400, no session created.
 - Provider email not verified and email already exists → refuse to link, show message.
@@ -125,4 +161,7 @@ Unique constraint: `(provider, provider_user_id)` on `user_identities`.
 - `apps/api/src/http/` — `ZodValidationPipe` and `DomainErrorFilter`
 - `apps/api/src/users/` — `UsersRepository` (built), identities repository (planned)
 - `apps/api/migrations/` — SQL migrations
-- `apps/web/src/features/auth/` — `useAuth`, login page, protected route
+- `packages/shared/src/auth.ts` — `signupSchema`, `loginSchema`, request and response types (used by API and web)
+- `apps/web/src/features/auth/` — `useAuth`, login/sign-up/logout mutations, `CredentialsForm`, `ProtectedRoute`, `GuestRoute`, `?next` checks
+- `apps/web/src/AppRoutes.tsx` — every URL; pages in `apps/web/src/pages/`
+- `e2e/auth.spec.ts` — the full journey in a real browser

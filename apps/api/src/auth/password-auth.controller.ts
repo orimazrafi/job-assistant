@@ -1,8 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Inject, Post, Req, Res } from '@nestjs/common';
-import type { CredentialsRequest, CurrentUserResponse } from '@job-assistant/shared';
+import { loginSchema, signupSchema, type CredentialsRequest, type CurrentUserResponse } from '@job-assistant/shared';
 import type { Request, Response } from 'express';
 import { ZodValidationPipe } from '../http/zod-validation.pipe.js';
-import { loginSchema, signupSchema } from './auth.schemas.js';
 import { SESSION_CONFIG } from './auth.tokens.js';
 import { readSessionId, setSessionCookie } from './cookie.js';
 import { PasswordAuthService, type SignedIn } from './password-auth.service.js';

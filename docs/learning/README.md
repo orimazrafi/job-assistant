@@ -13,7 +13,8 @@ Classic system design interview topics, and where each one shows up in this proj
 | System shape (modular monolith, producer/consumer, shared contracts) | API, worker, and web in one monorepo ([architecture](../architecture.md)) | Built | [system-shape](system-shape.md) |
 | Auth and sessions | Redis sessions, cookie, guard ([feature](../features/auth.md)) | Built (SSO planned) | [auth-sessions](auth-sessions.md) |
 | Password storage and login safety | argon2id, enumeration and timing, session rotation ([ADR 007](../adr/007-password-hashing-argon2id.md)) | Built | [password-storage](password-storage.md) |
-| Input validation | zod schemas in a Nest pipe ([ADR 008](../adr/008-request-validation-zod-pipe.md)) | Built | [password-storage](password-storage.md) |
+| Input validation | One zod schema for the web form and the Nest pipe ([ADR 008](../adr/008-request-validation-zod-pipe.md), [ADR 009](../adr/009-frontend-routing-auth-state-forms.md)) | Built | [password-storage](password-storage.md), [frontend-auth-routing](frontend-auth-routing.md) |
+| Frontend: routing, auth state, forms | React Router guards, React Query as auth state, open redirect ([ADR 009](../adr/009-frontend-routing-auth-state-forms.md)) | Built | [frontend-auth-routing](frontend-auth-routing.md) |
 | Concurrency and atomicity | `SessionStore` (`SET NX` / `XX`), unique constraints | Built | [concurrency-atomicity](concurrency-atomicity.md) |
 | Schema migrations | `apps/api/migrations/` ([ADR 006](../adr/006-migrations-node-pg-migrate.md)) | Built | — |
 | Queues and background jobs | BullMQ worker ping; job pipeline ([ADR 002](../adr/002-bullmq-on-redis.md)) | Partly built | — |
