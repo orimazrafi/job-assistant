@@ -32,7 +32,7 @@ Each card = one chat session = one commit (30–90 min). The app must start afte
 - **Don't:** rate limits, CSRF (slice B), SSO.
 - **Done when:** tests cover success, duplicate email, wrong password, logout.
 - **Verify:** sign up and log in with curl; `/api/auth/me` returns the user.
-- **Status:** todo
+- **Status:** done
 
 ### 001-04: Login UI and E2E journey
 - **Files:** `apps/web/src/features/auth/*`, `apps/web/src/api/http.ts`, `e2e/auth.spec.ts`
