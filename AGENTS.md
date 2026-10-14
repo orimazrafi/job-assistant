@@ -8,6 +8,7 @@ Stack: `apps/api` (NestJS), `apps/worker` (NestJS + BullMQ), `apps/web` (React),
 | Content | Location |
 |---|---|
 | Why a decision was made | `docs/adr/` |
+| General concepts and interview practice | `docs/learning/` |
 | What a feature does and how it flows (with diagrams) | `docs/features/` |
 | What a feature must do (acceptance criteria) | `docs/specs/` |
 | Small units of work | `docs/tasks/` |
@@ -15,7 +16,7 @@ Stack: `apps/api` (NestJS), `apps/worker` (NestJS + BullMQ), `apps/web` (React),
 | How to work in this repo | this file |
 | Current state and next steps (read first every session) | `docs/progress.md` |
 
-Roles (product-manager, architect, qa-engineer, backend-dev, frontend-dev, code-reviewer, handoff) are skills in `.cursor/skills/`.
+Roles (product-manager, architect, qa-engineer, backend-dev, frontend-dev, code-reviewer, mentor, handoff) are skills in `.cursor/skills/`.
 
 ## Commands
 Requires Node 24+, pnpm 12, Docker. First time: `cp .env.example .env && pnpm install`.

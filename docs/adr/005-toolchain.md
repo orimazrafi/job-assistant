@@ -30,3 +30,8 @@ flowchart LR
 ## Consequences
 - Good: one test runner, same module system everywhere, real-DB tests catch driver/config issues early.
 - Bad: ESM requires `.js` suffixes in imports; integration tests need Docker running.
+
+## Interview angle
+- **At scale:** "scale" here means the team and the codebase. With many packages, CI should build and test only what changed (Turborepo or Nx caching). As the schema grows, a query builder or ORM may start paying for itself.
+- **Failure modes:** raw SQL mistakes only show up at runtime, which is why integration tests run against a real Postgres instead of mocks.
+- **Likely follow-ups:** "Monorepo or polyrepo?" "What belongs in unit vs integration vs E2E tests?" "ORM, query builder, or raw SQL: when each?" "Why not mock the database?"

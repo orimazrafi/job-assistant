@@ -27,3 +27,8 @@ flowchart LR
 ## Consequences
 - Good: retries, backoff, delayed and repeatable jobs, concurrency control, one Redis for everything.
 - Bad: Redis must be persistent (AOF) so queued jobs survive restarts.
+
+## Interview angle
+- **At scale:** add workers horizontally. Keep payloads small (ids, not documents) because queued jobs live in Redis memory. Separate queues per job type, so slow AI scoring can't starve fetching. At very high event volume or when replay matters, a log like Kafka fits better than a queue.
+- **Failure modes:** delivery is at-least-once: a worker that crashes mid-job leaves it "stalled", and BullMQ runs it again, so every job must be idempotent. A job that always fails stops after its retry limit and waits in the failed set.
+- **Likely follow-ups:** "At-least-once vs exactly-once?" "How do you make a job safe to run twice?" "How do you notice queue lag and apply backpressure?" "Queue vs stream: when do you choose Kafka?"

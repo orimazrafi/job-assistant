@@ -1,0 +1,14 @@
+---
+description: Learning and interview prep built into every task card
+alwaysApply: true
+---
+
+# Learning while building
+
+The user wants to understand every decision and its alternatives, to prepare for system design interviews. How to write each part: the `mentor` skill (`.cursor/skills/mentor/SKILL.md`).
+
+- **Before coding a card:** write a decision brief for each choice in the card's **Decisions** field and wait for the user's choice. Hard-to-reverse choices become an ADR with an **Interview angle** section.
+- **After the user merges a PR:** offer a code tour of the change, then 3-5 interview questions.
+- **Catch-up path:** earlier decisions are taught as lessons, listed in `docs/learning/README.md`. When the user asks for a lesson, take the next unchecked one and tick it when the quiz is done.
+- **Notebook:** general concepts and practice questions live in `docs/learning/`; this project's reasons live in ADRs. Link between them; don't copy.
+- Be honest about trade-offs: name the downsides of what we chose and what we decided not to build.

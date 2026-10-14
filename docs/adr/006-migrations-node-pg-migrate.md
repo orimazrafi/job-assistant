@@ -26,3 +26,8 @@ flowchart LR
 ## Consequences
 - Good: SQL is reviewed as written; one small dependency built on `pg`; an advisory lock prevents concurrent runs; every migration has a tested down step.
 - Bad / trade-offs: deploys and CI must run `pnpm db:migrate` before starting the API; the CLI loads `.env` through Node's `--env-file-if-exists` because its own dotenv support needs an extra package.
+
+## Interview angle
+- **At scale:** big tables need zero-downtime changes. Use **expand and contract**: add the new column, backfill in batches, switch the code, and drop the old column in a later release. Build indexes with `CREATE INDEX CONCURRENTLY` so writes aren't blocked.
+- **Failure modes:** Postgres DDL runs in a transaction, so a failed migration rolls back cleanly. The real risk is ordering: code must work with both the old and new schema during a deploy. In production, teams usually roll forward with a new migration rather than run a down step.
+- **Likely follow-ups:** "Rename a column with no downtime." "Migrate on startup or as a separate step?" "Are down migrations useful in production?" "How do you backfill 100M rows?"

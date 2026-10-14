@@ -26,3 +26,8 @@ flowchart LR
 ## Consequences
 - Good: clear split; raw data can be re-normalized when the normalizer improves.
 - Bad: two databases to run, back up, and test.
+
+## Interview angle
+- **At scale:** raw payloads grow fastest, so they get a TTL index and, much later, sharding by source. Postgres scales reads with replicas; writes scale up first, then by partitioning `jobs` by date.
+- **Failure modes:** there is no transaction across the two stores. Raw data is written first and normalizing is idempotent, so a failed normalize is re-run from Mongo. If Mongo is down, fetching pauses and retries; the app keeps serving from Postgres.
+- **Likely follow-ups:** "Why not JSONB in Postgres?" "A write to one store succeeds and the other fails: what then?" "When does polyglot persistence cost more than it gives?"

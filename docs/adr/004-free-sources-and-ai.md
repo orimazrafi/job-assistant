@@ -28,3 +28,8 @@ flowchart LR
 ## Consequences
 - Good: zero running cost; provider swap is a config change.
 - Bad: coverage depends on the seed company list; local models are slower and weaker, so AI runs only on pre-filtered jobs.
+
+## Interview angle
+- **At scale:** each source API has its own rate limit, so fetching needs a per-host limiter and backoff. A local LLM handles a few requests per second at best, so ranking is a funnel: cheap filters and embeddings first, the LLM only on the top candidates.
+- **Failure modes:** a source changes its response format, so the raw payload is kept and only that source's normalizer fails, visibly. The LLM is down or the Gemini quota runs out, so scores stay pending and are retried later.
+- **Likely follow-ups:** "Design a polite crawler." "How do you measure whether AI scoring is any good?" "How do you swap LLM providers without touching business logic?" (the strategy pattern behind `LlmProvider`) "How do you cap AI cost?"
