@@ -32,3 +32,12 @@ export async function requestJson<T>(
       : `Request failed with status ${res.status}`;
   throw new ApiError(res.status, message);
 }
+
+/** Sends `body` as JSON with `method` (POST by default) and returns the parsed response like `requestJson`. */
+export function sendJson<T>(path: string, body?: unknown, method = 'POST'): Promise<T> {
+  return requestJson<T>(path, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+}

@@ -53,8 +53,8 @@ flowchart LR
 apps/api         NestJS REST API (ESM, port 3000, prefix /api)
 apps/worker      NestJS BullMQ workers (no HTTP)
 apps/web         React + Vite (port 5173, proxies /api to the API)
-packages/shared  shared types, queue names, job payloads
-e2e/             Playwright smoke tests
+packages/shared  shared types, queue names, job payloads, zod request schemas (used by API and web)
+e2e/             Playwright tests (smoke + auth journey)
 ```
 
 Toolchain and testing levels: [ADR 005](adr/005-toolchain.md).

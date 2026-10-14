@@ -1,6 +1,6 @@
 # ADR 008 — Request validation with zod schemas and a Nest pipe
 
-**Status:** Accepted
+**Status:** Accepted (schemas moved to `packages/shared` in [ADR 009](009-frontend-routing-auth-state-forms.md), so the web form uses them too)
 **Date:** 2026-10-14
 
 ## Context

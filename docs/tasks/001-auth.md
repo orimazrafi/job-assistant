@@ -37,10 +37,11 @@ Each card = one chat session = one commit (30–90 min). The app must start afte
 ### 001-04: Login UI and E2E journey
 - **Files:** `apps/web/src/features/auth/*`, `apps/web/src/api/http.ts`, `e2e/auth.spec.ts`
 - **Do:** `useAuth` hook, login and sign-up pages, protected route, logout button; Playwright journey.
+- **Decisions:** routing library; where auth state lives in React; form validation (shared zod schemas or not); which URLs are protected. See [ADR 009](../adr/009-frontend-routing-auth-state-forms.md).
 - **Don't:** SSO buttons.
 - **Done when:** component tests and E2E (sign up → log in → refresh still logged in → log out) pass.
 - **Verify:** do the journey yourself in the browser.
-- **Status:** todo
+- **Status:** done (also: CI's E2E job now runs `pnpm db:migrate`; the status page moved to `/status`)
 
 ## Slice B — Session safety
 
