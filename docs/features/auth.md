@@ -1,6 +1,6 @@
 # Feature: Authentication
 
-**Status:** In progress (`users` table, Redis sessions, and `GET /api/auth/me` done; no login yet)
+**Status:** In progress (API for email sign-up, login, logout, and `GET /api/auth/me` done; no UI, rate limits, CSRF, or SSO yet)
 **Spec:** [001](../specs/001-auth.md) · **Tasks:** [001](../tasks/001-auth.md)
 
 ## TL;DR
@@ -49,20 +49,27 @@ sequenceDiagram
 sequenceDiagram
     actor U as User
     participant A as NestJS API
-    participant R as Redis
     participant P as Postgres
-    U->>A: POST /auth/login (email, password, CSRF token)
-    A->>R: Check rate limit (IP + account)
+    participant R as Redis
+    U->>A: POST /api/auth/login with email and password
+    A->>A: ZodValidationPipe checks the body (400 if malformed)
     A->>P: Load user by email
-    A->>A: argon2 verify
+    alt user has a password
+        A->>A: argon2id verify against stored hash
+    else unknown email or SSO-only
+        A->>A: verify against a dummy hash (same time spent)
+    end
     alt valid
-        A->>R: Create NEW session
-        A-->>U: 200 + Set __Host-sid
+        A->>R: DEL old session (if cookie sent), SET NEW session
+        A-->>U: 200 user + Set __Host-sid
     else invalid
-        A->>R: Increment failure counter
-        A-->>U: 401 generic error
+        A-->>U: 401 Invalid email or password
     end
 ```
+
+Sign-up (`POST /api/auth/signup`) is the same shape: validate (password 10–128 characters), hash with argon2id, insert the user (the unique constraint turns a taken email into 409), then start a new session and return 201. Logout (`POST /api/auth/logout`) deletes the session named by the cookie, clears the cookie, and always returns 204.
+
+Card 001-06 adds rate limits (IP and account failure counters in Redis) and CSRF protection in front of these endpoints.
 
 ## Data model
 
@@ -99,8 +106,14 @@ Unique constraint: `(provider, provider_user_id)` on `user_identities`.
 ## Key decisions
 - Sessions in Redis, not JWT — [ADR 003](../adr/003-server-side-sessions.md)
 - Schema changes as plain SQL migrations with node-pg-migrate — [ADR 006](../adr/006-migrations-node-pg-migrate.md)
+- Passwords hashed with argon2id via `@node-rs/argon2` — [ADR 007](../adr/007-password-hashing-argon2id.md)
+- Request bodies validated with zod schemas in a Nest pipe — [ADR 008](../adr/008-request-validation-zod-pipe.md)
+- Duplicate email at sign-up returns 409, which reveals that the email is registered. Accepted for usability; rate limits (card 001-06) slow down anyone harvesting emails this way. Login never reveals it.
 
 ## Failure handling
+- Malformed body (bad email, password too short or long, missing fields) → 400 `ValidationError` listing each problem.
+- Email already registered at sign-up → 409 `EmailTakenError`, no session.
+- Wrong password, unknown email, or SSO-only account at login → the same 401 "Invalid email or password", after the same hashing work.
 - Missing, expired, unknown, or revoked session → 401 with a generic message; a dead cookie is cleared. React will redirect to `/login` (card 001-04).
 - Session whose account was deleted → session destroyed, 401.
 - Invalid `state` or `nonce` on callback → 400, no session created.
@@ -108,7 +121,8 @@ Unique constraint: `(provider, provider_user_id)` on `user_identities`.
 - Rate limit exceeded → 429 with `Retry-After`.
 
 ## Where the code lives
-- `apps/api/src/auth/` — `SessionStore`, `SessionGuard`, cookie helpers, `@CurrentUser()`, `GET /auth/me` (built); login endpoints and OIDC client (planned)
+- `apps/api/src/auth/` — `SessionStore`, `SessionGuard`, cookie helpers, `@CurrentUser()`, `GET /auth/me`, `POST /auth/logout`, `PasswordHasher`, `PasswordAuthService` and controller for sign-up and login (built); OIDC client (planned)
+- `apps/api/src/http/` — `ZodValidationPipe` and `DomainErrorFilter`
 - `apps/api/src/users/` — `UsersRepository` (built), identities repository (planned)
 - `apps/api/migrations/` — SQL migrations
 - `apps/web/src/features/auth/` — `useAuth`, login page, protected route

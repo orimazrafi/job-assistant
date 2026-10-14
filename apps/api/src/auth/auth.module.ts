@@ -5,6 +5,9 @@ import { UsersModule } from '../users/users.module.js';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { SESSION_CONFIG } from './auth.tokens.js';
+import { PasswordAuthController } from './password-auth.controller.js';
+import { PasswordAuthService } from './password-auth.service.js';
+import { PasswordHasher } from './password-hasher.js';
 import type { SessionConfig } from './session.js';
 import { SessionGuard } from './session.guard.js';
 import { SessionStore } from './session.store.js';
@@ -12,7 +15,7 @@ import { SessionStore } from './session.store.js';
 /** Sessions and the auth endpoints. Exports the guard and store for other protected modules. */
 @Module({
   imports: [UsersModule],
-  controllers: [AuthController],
+  controllers: [AuthController, PasswordAuthController],
   providers: [
     {
       provide: SESSION_CONFIG,
@@ -25,6 +28,8 @@ import { SessionStore } from './session.store.js';
     SessionStore,
     SessionGuard,
     AuthService,
+    PasswordHasher,
+    PasswordAuthService,
   ],
   exports: [SessionStore, SessionGuard],
 })
