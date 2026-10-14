@@ -12,6 +12,8 @@ export const envSchema = z
     // Spec 001: a session ends after 7 days without use or 30 days after login.
     SESSION_IDLE_TTL_SECONDS: z.coerce.number().int().positive().default(7 * DAY_SECONDS),
     SESSION_ABSOLUTE_TTL_SECONDS: z.coerce.number().int().positive().default(30 * DAY_SECONDS),
+    // Opt-in: the queue dashboard can retry and delete jobs, so a forgotten setting keeps it off.
+    QUEUE_DASHBOARD_ENABLED: z.stringbool().default(false),
   })
   .refine((env) => env.SESSION_ABSOLUTE_TTL_SECONDS >= env.SESSION_IDLE_TTL_SECONDS, {
     path: ['SESSION_ABSOLUTE_TTL_SECONDS'],

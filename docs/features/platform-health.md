@@ -59,6 +59,19 @@ sequenceDiagram
     Note over A,W: If no answer within 5 s, remove the job and return 504
 ```
 
+## Queue dashboard (development only)
+
+Bull Board shows every BullMQ queue at `/api/queues` (also through the web app: http://localhost:5173/api/queues): jobs waiting, active, completed, and failed, with retry and delete buttons.
+
+```mermaid
+flowchart LR
+    B["Browser /api/queues"] --> BB["Bull Board (API middleware)"]
+    BB -->|"read counts and jobs"| Q[["BullMQ queues in Redis"]]
+    SM["SystemModule: forQueue('system')"] -.->|"registers"| BB
+```
+
+It can change jobs and has no login yet, so it is **fail-closed**: mounted only when `QUEUE_DASHBOARD_ENABLED=true` **and** `NODE_ENV` is not `production`. Forgetting either setting keeps it off (`.env.example` turns it on for development). Each module that registers a queue also adds it to the dashboard with `QueueDashboardModule.forQueue(name)`.
+
 ## Key decisions
 - Raw drivers (`pg`, `mongodb`, `ioredis`), no ORM yet — [ADR 005](../adr/005-toolchain.md)
 - BullMQ on Redis — [ADR 002](../adr/002-bullmq-on-redis.md)
@@ -73,6 +86,7 @@ sequenceDiagram
 ## Where the code lives
 - `apps/api/src/health/` — checks, service, controller
 - `apps/api/src/system/` — ping endpoint, QueueEvents, WorkerTimeoutError
+- `apps/api/src/queue-dashboard/` — Bull Board, development only
 - `apps/api/src/infra/` — Postgres/Mongo/Redis clients (composition root)
 - `apps/worker/src/system/` — `SystemProcessor`, `PingService`
 - `apps/web/src/features/system/` — `HealthPanel`, `PingPanel`, hooks

@@ -30,6 +30,16 @@ describe('validateEnv', () => {
     ).toThrow(/SESSION_ABSOLUTE_TTL_SECONDS/);
   });
 
+  it('keeps the queue dashboard off unless it is enabled explicitly', () => {
+    expect(validateEnv(validEnv).QUEUE_DASHBOARD_ENABLED).toBe(false);
+    expect(validateEnv({ ...validEnv, QUEUE_DASHBOARD_ENABLED: 'true' }).QUEUE_DASHBOARD_ENABLED).toBe(true);
+    expect(validateEnv({ ...validEnv, QUEUE_DASHBOARD_ENABLED: 'false' }).QUEUE_DASHBOARD_ENABLED).toBe(false);
+  });
+
+  it('rejects a queue dashboard flag that is not a boolean', () => {
+    expect(() => validateEnv({ ...validEnv, QUEUE_DASHBOARD_ENABLED: 'maybe' })).toThrow(/QUEUE_DASHBOARD_ENABLED/);
+  });
+
   it('rejects a missing variable with its name in the message', () => {
     const { REDIS_URL: _omitted, ...withoutRedis } = validEnv;
     expect(() => validateEnv(withoutRedis)).toThrow(/REDIS_URL/);

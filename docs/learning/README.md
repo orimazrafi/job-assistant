@@ -23,7 +23,9 @@ Classic system design interview topics, and where each one shows up in this proj
 | Deduplication and idempotency | "Seen before?" step in the job pipeline | Planned | — |
 | Search and ranking | Relevance scoring against the CV | Planned | — |
 | Caching | Redis cache (not used yet) | Planned | — |
-| Observability | Health checks only | Partly built | — |
+| Observability | Health checks; Bull Board queue dashboard at `/api/queues` (opt-in, never in production) | Partly built | — |
+| Feature flags and secure defaults | `QUEUE_DASHBOARD_ENABLED` (fail-closed, defense in depth) | Built | [feature-flags](feature-flags.md) |
+| Framework: NestJS building blocks | Modules, DI, request lifecycle, dynamic modules, middleware vs guards | Built | [nestjs-building-blocks](nestjs-building-blocks.md) |
 | Scaling and replication | Not covered: single-node stores | Not covered | Discuss in "At scale" sections |
 
 When a card touches a topic, its entry is created or updated in the same PR.

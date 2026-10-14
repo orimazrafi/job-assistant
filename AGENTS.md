@@ -23,7 +23,7 @@ Requires Node 24+, pnpm 12, Docker. First time: `cp .env.example .env && pnpm in
 - `docker compose up -d` — Postgres (host port 5433), MongoDB, Redis
 - `pnpm db:migrate` — apply pending Postgres migrations (run after pulling; the API does not migrate on startup)
 - `pnpm --filter @job-assistant/api db:migration:new <name>` — create an SQL migration in `apps/api/migrations/`
-- `pnpm dev` — API :3000, worker, web :5173 (status page)
+- `pnpm dev` — API :3000, worker, web :5173 (status page); queue dashboard at http://localhost:5173/api/queues (needs `QUEUE_DASHBOARD_ENABLED=true` in `.env`)
 - `pnpm lint` / `pnpm typecheck`
 - `pnpm test` — unit tests (all apps)
 - `pnpm test:int` — integration tests with Testcontainers (Docker must be running)
