@@ -23,7 +23,9 @@ export class PasswordAuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<CurrentUserResponse> {
-    return this.respond(res, await this.passwordAuth.signup(body, readSessionId(req.headers.cookie)));
+    const previousSessionId = readSessionId(req.headers.cookie);
+    const signedIn = await this.passwordAuth.signup(body, previousSessionId);
+    return this.respond(res, signedIn);
   }
 
   /** `POST /api/auth/login`: 200 and signed in, 400 for an invalid body, 401 for wrong credentials. */
@@ -34,7 +36,9 @@ export class PasswordAuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<CurrentUserResponse> {
-    return this.respond(res, await this.passwordAuth.login(body, readSessionId(req.headers.cookie)));
+    const previousSessionId = readSessionId(req.headers.cookie);
+    const signedIn = await this.passwordAuth.login(body, previousSessionId);
+    return this.respond(res, signedIn);
   }
 
   /** Sets the session cookie for the whole absolute lifetime (Redis enforces the idle limit) and returns the user. */

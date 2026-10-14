@@ -27,7 +27,8 @@ export class PasswordAuthService {
    * @throws EmailTakenError (409) when the email already has an account.
    */
   async signup(input: CredentialsRequest, previousSessionId?: string): Promise<SignedIn> {
-    const user = await this.users.create({ email: input.email, passwordHash: await this.hasher.hash(input.password) });
+    const passwordHash = await this.hasher.hash(input.password);
+    const user = await this.users.create({ email: input.email, passwordHash });
     const session = await this.auth.startSession(user.id, previousSessionId);
     return { user: toCurrentUserResponse(user), session };
   }
@@ -40,10 +41,13 @@ export class PasswordAuthService {
    */
   async login(input: CredentialsRequest, previousSessionId?: string): Promise<SignedIn> {
     const user = await this.users.findByEmail(input.email);
-    const valid = user?.passwordHash
-      ? await this.hasher.verify(user.passwordHash, input.password)
-      : await this.hasher.verifyDummy(input.password);
-    if (!user || !valid) throw new InvalidCredentialsError();
+    if (!user?.passwordHash) {
+      await this.hasher.verifyDummy(input.password);
+      throw new InvalidCredentialsError();
+    }
+
+    const valid = await this.hasher.verify(user.passwordHash, input.password);
+    if (!valid) throw new InvalidCredentialsError();
 
     const session = await this.auth.startSession(user.id, previousSessionId);
     return { user: toCurrentUserResponse(user), session };
