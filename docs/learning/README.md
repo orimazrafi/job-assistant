@@ -10,6 +10,7 @@ Classic system design interview topics, and where each one shows up in this proj
 
 | Topic | Where in this project | Status | Notes |
 |---|---|---|---|
+| System shape (modular monolith, producer/consumer, shared contracts) | API, worker, and web in one monorepo ([architecture](../architecture.md)) | Built | [system-shape](system-shape.md) |
 | Auth and sessions | Redis sessions, cookie, guard ([feature](../features/auth.md)) | Built (login in progress) | [auth-sessions](auth-sessions.md) |
 | Concurrency and atomicity | `SessionStore` (`SET NX` / `XX`), unique constraints | Built | [concurrency-atomicity](concurrency-atomicity.md) |
 | Schema migrations | `apps/api/migrations/` ([ADR 006](../adr/006-migrations-node-pg-migrate.md)) | Built | — |
@@ -32,7 +33,7 @@ When a card touches a topic, its entry is created or updated in the same PR.
 Decisions made before the learning workflow existed, replayed as lessons (about 20-30 minutes each).
 Each lesson: a decision brief as if choosing again (the problem, the options, what we chose and why, and what would change the choice), then a quiz, then a notebook entry.
 
-- [ ] 1. **System shape:** API, a separate worker, and web in one monorepo; a walking skeleton first. ([architecture](../architecture.md), [ADR 005](../adr/005-toolchain.md))
+- [x] 1. **System shape:** API, a separate worker, and web in one monorepo; a walking skeleton first. ([architecture](../architecture.md), [ADR 005](../adr/005-toolchain.md))
 - [ ] 2. **Data stores:** Postgres, MongoDB, and Redis, and what each one holds. ([ADR 001](../adr/001-postgres-plus-mongodb.md))
 - [ ] 3. **Background jobs:** BullMQ vs RabbitMQ, Kafka, or cron. ([ADR 002](../adr/002-bullmq-on-redis.md))
 - [ ] 4. **Sessions vs JWT:** mostly covered in the code tours; quiz only. ([ADR 003](../adr/003-server-side-sessions.md), [notes](auth-sessions.md))
