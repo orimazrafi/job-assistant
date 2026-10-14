@@ -10,13 +10,14 @@ describe('queue dashboard at /api/queues (real Redis)', () => {
   let app: INestApplication | undefined;
 
   /**
-   * Boots the whole API with the given NODE_ENV and dashboard flag (unset when undefined).
-   * Modules are reset first because the dashboard decides whether to mount when AppModule is imported.
+   * Boots the whole API with the given NODE_ENV and dashboard flag. Both are always set, because
+   * ConfigModule fills unset variables from the developer's `.env`. The "unset means off" default
+   * is covered by the unit test of `dashboardEnabled`. Modules are reset first because the
+   * dashboard decides whether to mount when AppModule is imported.
    */
-  async function startApp(nodeEnv: string, dashboardFlag?: string): Promise<INestApplication> {
+  async function startApp(nodeEnv: string, dashboardFlag: 'true' | 'false'): Promise<INestApplication> {
     process.env.NODE_ENV = nodeEnv;
-    if (dashboardFlag === undefined) delete process.env.QUEUE_DASHBOARD_ENABLED;
-    else process.env.QUEUE_DASHBOARD_ENABLED = dashboardFlag;
+    process.env.QUEUE_DASHBOARD_ENABLED = dashboardFlag;
     vi.resetModules();
     const { AppModule } = await import('../src/app.module.js');
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
@@ -52,8 +53,8 @@ describe('queue dashboard at /api/queues (real Redis)', () => {
     expect(queues.body.queues.map((q: { name: string }) => q.name)).toEqual(['system']);
   });
 
-  it('keeps the dashboard off when the flag is not set (fail-closed)', async () => {
-    const server = (await startApp('development')).getHttpServer();
+  it('keeps the dashboard off when the flag is false', async () => {
+    const server = (await startApp('development', 'false')).getHttpServer();
 
     await request(server).get('/api/queues').expect(404);
   });

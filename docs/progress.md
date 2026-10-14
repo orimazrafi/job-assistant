@@ -7,7 +7,7 @@ Card 000-06 (queue dashboard) on branch `card/000-06`, in review. Next: auth car
 - 000-06: Bull Board queue dashboard at `/api/queues` (opt-in flag, never in production), wired with `@bull-board/nestjs`; each module registers its own queues via `QueueDashboardModule.forQueue(name)`. Lesson notes: `docs/learning/feature-flags.md`, `docs/learning/nestjs-building-blocks.md`.
 - Learning workflow ([PR #5](https://github.com/orimazrafi/job-assistant/pull/5)): decision briefs before coding, code tours and quizzes after merges, ADR "Interview angle", notebook in `docs/learning/` with a 9-lesson catch-up path. Lesson 1 (system shape) done.
 - 001-02 ([PR #4](https://github.com/orimazrafi/job-assistant/pull/4)): Redis sessions (7 days idle, 30 days total), `__Host-sid` cookie, `SessionGuard`, `GET /api/auth/me`.
-- Tests: 34 unit (API 25), 8 hook-rule groups, 24 integration.
+- Tests: 38 unit (API 29), 8 hook-rule groups, 24 integration.
 
 ## Decisions made
 - Queue dashboard: fail-closed feature flag. On only with `QUEUE_DASHBOARD_ENABLED=true` and never in production (it can retry and delete jobs and has no login yet); move behind login with an admin check once auth exists. Existing local `.env` files need the flag added by hand.

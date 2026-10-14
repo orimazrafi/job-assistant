@@ -14,7 +14,7 @@ export const QUEUE_DASHBOARD_ROUTE = '/queues';
  * setting keeps it off. Called after ConfigModule has loaded `.env`; parses with the same schema
  * so defaults and boolean parsing match the validated config.
  */
-function dashboardEnabled(env: NodeJS.ProcessEnv): boolean {
+export function dashboardEnabled(env: NodeJS.ProcessEnv): boolean {
   const { QUEUE_DASHBOARD_ENABLED, NODE_ENV } = validateEnv(env);
   return QUEUE_DASHBOARD_ENABLED && NODE_ENV !== 'production';
 }
