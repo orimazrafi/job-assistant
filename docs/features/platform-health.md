@@ -70,7 +70,7 @@ flowchart LR
     SM["SystemModule: forQueue('system')"] -.->|"registers"| BB
 ```
 
-It is mounted only when `NODE_ENV` is not `production`, because it can change jobs and has no login yet. Each module that registers a queue also adds it to the dashboard with `QueueDashboardModule.forQueue(name)`.
+It can change jobs and has no login yet, so it is **fail-closed**: mounted only when `QUEUE_DASHBOARD_ENABLED=true` **and** `NODE_ENV` is not `production`. Forgetting either setting keeps it off (`.env.example` turns it on for development). Each module that registers a queue also adds it to the dashboard with `QueueDashboardModule.forQueue(name)`.
 
 ## Key decisions
 - Raw drivers (`pg`, `mongodb`, `ioredis`), no ORM yet — [ADR 005](../adr/005-toolchain.md)

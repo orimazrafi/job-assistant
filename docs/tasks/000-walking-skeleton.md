@@ -48,8 +48,8 @@ Each card = one commit. The app must start after every card.
 ## 000-06: Queue dashboard (Bull Board)
 - **Files:** `apps/api/src/app.module.ts`, `apps/api/src/system/system.module.ts`, `apps/api/src/queue-dashboard/*` (+ integration test)
 - **Do:** Bull Board at `/api/queues` showing the `system` queue; each feature module registers its own queues.
-- **Decisions:** who can open it (chosen: development only, behind login and an admin check later); wiring (chosen: `@bull-board/nestjs`).
+- **Decisions:** who can open it (chosen: development only, behind login and an admin check later); wiring (chosen: `@bull-board/nestjs`); the switch (chosen: opt-in `QUEUE_DASHBOARD_ENABLED`, default off, and never in production).
 - **Don't:** mount it in production; add auth to it.
-- **Done when:** integration test proves it answers outside production and is absent in production; feature doc updated.
+- **Done when:** integration test proves it answers only when enabled outside production (off by default, off in production even when enabled); feature doc updated.
 - **Verify:** with `pnpm dev`, open http://localhost:5173/api/queues, click "Ping worker" on the status page, and see the job under `system` → Completed.
 - **Status:** done

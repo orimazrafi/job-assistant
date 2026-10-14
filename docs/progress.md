@@ -4,13 +4,13 @@
 Card 000-06 (queue dashboard) on branch `card/000-06`, in review. Next: auth card 001-03, starting with its decision brief. Repo: https://github.com/orimazrafi/job-assistant.
 
 ## Done recently
-- 000-06: Bull Board queue dashboard at `/api/queues` (development only), wired with `@bull-board/nestjs`; each module registers its own queues via `QueueDashboardModule.forQueue(name)`.
+- 000-06: Bull Board queue dashboard at `/api/queues` (opt-in flag, never in production), wired with `@bull-board/nestjs`; each module registers its own queues via `QueueDashboardModule.forQueue(name)`. Lesson notes: `docs/learning/feature-flags.md`, `docs/learning/nestjs-building-blocks.md`.
 - Learning workflow ([PR #5](https://github.com/orimazrafi/job-assistant/pull/5)): decision briefs before coding, code tours and quizzes after merges, ADR "Interview angle", notebook in `docs/learning/` with a 9-lesson catch-up path. Lesson 1 (system shape) done.
 - 001-02 ([PR #4](https://github.com/orimazrafi/job-assistant/pull/4)): Redis sessions (7 days idle, 30 days total), `__Host-sid` cookie, `SessionGuard`, `GET /api/auth/me`.
-- Tests: 32 unit (API 23), 8 hook-rule groups, 23 integration.
+- Tests: 34 unit (API 25), 8 hook-rule groups, 24 integration.
 
 ## Decisions made
-- Queue dashboard: development only (it can retry and delete jobs and has no login yet); move behind login with an admin check once auth exists.
+- Queue dashboard: fail-closed feature flag. On only with `QUEUE_DASHBOARD_ENABLED=true` and never in production (it can retry and delete jobs and has no login yet); move behind login with an admin check once auth exists. Existing local `.env` files need the flag added by hand.
 - The user wants to learn the why and the alternatives of every decision: see `.cursor/rules/learning.mdc`.
 - ADRs: [001](adr/001-postgres-plus-mongodb.md) Postgres + Mongo, [002](adr/002-bullmq-on-redis.md) BullMQ, [003](adr/003-server-side-sessions.md) sessions, [004](adr/004-free-sources-and-ai.md) free sources/AI, [005](adr/005-toolchain.md) toolchain, [006](adr/006-migrations-node-pg-migrate.md) migrations.
 

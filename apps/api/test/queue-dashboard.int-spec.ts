@@ -10,11 +10,13 @@ describe('queue dashboard at /api/queues (real Redis)', () => {
   let app: INestApplication | undefined;
 
   /**
-   * Boots the whole API with the given NODE_ENV. Modules are reset first because the
-   * dashboard decides whether to mount when AppModule is imported.
+   * Boots the whole API with the given NODE_ENV and dashboard flag (unset when undefined).
+   * Modules are reset first because the dashboard decides whether to mount when AppModule is imported.
    */
-  async function startApp(nodeEnv: string): Promise<INestApplication> {
+  async function startApp(nodeEnv: string, dashboardFlag?: string): Promise<INestApplication> {
     process.env.NODE_ENV = nodeEnv;
+    if (dashboardFlag === undefined) delete process.env.QUEUE_DASHBOARD_ENABLED;
+    else process.env.QUEUE_DASHBOARD_ENABLED = dashboardFlag;
     vi.resetModules();
     const { AppModule } = await import('../src/app.module.js');
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
@@ -40,8 +42,8 @@ describe('queue dashboard at /api/queues (real Redis)', () => {
     await redis?.stop();
   });
 
-  it('serves the dashboard and lists the system queue outside production', async () => {
-    const server = (await startApp('development')).getHttpServer();
+  it('serves the dashboard and lists the system queue when enabled in development', async () => {
+    const server = (await startApp('development', 'true')).getHttpServer();
 
     const page = await request(server).get('/api/queues').expect(200);
     expect(page.text).toContain('<title>Bull Dashboard</title>');
@@ -50,8 +52,14 @@ describe('queue dashboard at /api/queues (real Redis)', () => {
     expect(queues.body.queues.map((q: { name: string }) => q.name)).toEqual(['system']);
   });
 
-  it('does not mount the dashboard in production', async () => {
-    const server = (await startApp('production')).getHttpServer();
+  it('keeps the dashboard off when the flag is not set (fail-closed)', async () => {
+    const server = (await startApp('development')).getHttpServer();
+
+    await request(server).get('/api/queues').expect(404);
+  });
+
+  it('never mounts the dashboard in production, even with the flag on', async () => {
+    const server = (await startApp('production', 'true')).getHttpServer();
 
     await request(server).get('/api/queues').expect(404);
     await request(server).get('/api/health').expect((res) => expect(res.status).not.toBe(404));

@@ -3,16 +3,20 @@ import { ExpressAdapter } from '@bull-board/express';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { Module } from '@nestjs/common';
 import { ConditionalModule } from '@nestjs/config';
+import { validateEnv } from '../config/env.js';
 
 /** Served under the global prefix, so the dashboard lives at `/api/queues`. */
 export const QUEUE_DASHBOARD_ROUTE = '/queues';
 
 /**
- * The dashboard can retry and delete jobs and shows job data, and it has no login yet,
- * so it is never mounted in production. Reads env after ConfigModule has loaded `.env`.
+ * The dashboard can retry and delete jobs and shows job data, and it has no login yet. Fail-closed:
+ * mounted only when QUEUE_DASHBOARD_ENABLED is true AND not in production, so forgetting either
+ * setting keeps it off. Called after ConfigModule has loaded `.env`; parses with the same schema
+ * so defaults and boolean parsing match the validated config.
  */
 function dashboardEnabled(env: NodeJS.ProcessEnv): boolean {
-  return env.NODE_ENV !== 'production';
+  const { QUEUE_DASHBOARD_ENABLED, NODE_ENV } = validateEnv(env);
+  return QUEUE_DASHBOARD_ENABLED && NODE_ENV !== 'production';
 }
 
 /**
@@ -21,7 +25,7 @@ function dashboardEnabled(env: NodeJS.ProcessEnv): boolean {
  */
 @Module({})
 export class QueueDashboardModule {
-  /** Mounts the dashboard UI and API at `/api/queues`, outside production only. */
+  /** Mounts the dashboard UI and API at `/api/queues` when enabled (see `dashboardEnabled`). */
   static forRoot() {
     return ConditionalModule.registerWhen(
       BullBoardModule.forRoot({ route: QUEUE_DASHBOARD_ROUTE, adapter: ExpressAdapter }),
