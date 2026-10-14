@@ -44,3 +44,12 @@ Each card = one commit. The app must start after every card.
 - **Done when:** `pnpm test:e2e` passes locally.
 - **Verify:** `pnpm test:e2e` prints `passed`.
 - **Status:** done (CI workflow written; first run happens once the repo is pushed to GitHub)
+
+## 000-06: Queue dashboard (Bull Board)
+- **Files:** `apps/api/src/app.module.ts`, `apps/api/src/system/system.module.ts`, `apps/api/src/queue-dashboard/*` (+ integration test)
+- **Do:** Bull Board at `/api/queues` showing the `system` queue; each feature module registers its own queues.
+- **Decisions:** who can open it (chosen: development only, behind login and an admin check later); wiring (chosen: `@bull-board/nestjs`).
+- **Don't:** mount it in production; add auth to it.
+- **Done when:** integration test proves it answers outside production and is absent in production; feature doc updated.
+- **Verify:** with `pnpm dev`, open http://localhost:5173/api/queues, click "Ping worker" on the status page, and see the job under `system` → Completed.
+- **Status:** done

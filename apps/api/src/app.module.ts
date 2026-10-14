@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { validateEnv, type Env } from './config/env.js';
 import { HealthModule } from './health/health.module.js';
 import { InfraModule } from './infra/infra.module.js';
+import { QueueDashboardModule } from './queue-dashboard/queue-dashboard.module.js';
 import { SystemModule } from './system/system.module.js';
 import { UsersModule } from './users/users.module.js';
 
@@ -23,6 +24,7 @@ import { UsersModule } from './users/users.module.js';
         connection: { url: config.get('REDIS_URL', { infer: true }) },
       }),
     }),
+    QueueDashboardModule.forRoot(),
     InfraModule,
     HealthModule,
     SystemModule,

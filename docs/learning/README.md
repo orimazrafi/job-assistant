@@ -23,7 +23,7 @@ Classic system design interview topics, and where each one shows up in this proj
 | Deduplication and idempotency | "Seen before?" step in the job pipeline | Planned | — |
 | Search and ranking | Relevance scoring against the CV | Planned | — |
 | Caching | Redis cache (not used yet) | Planned | — |
-| Observability | Health checks only | Partly built | — |
+| Observability | Health checks; Bull Board queue dashboard at `/api/queues` (development only) | Partly built | — |
 | Scaling and replication | Not covered: single-node stores | Not covered | Discuss in "At scale" sections |
 
 When a card touches a topic, its entry is created or updated in the same PR.

@@ -4,12 +4,13 @@ import { ConfigService } from '@nestjs/config';
 import { QUEUES } from '@job-assistant/shared';
 import { QueueEvents } from 'bullmq';
 import type { Env } from '../config/env.js';
+import { QueueDashboardModule } from '../queue-dashboard/queue-dashboard.module.js';
 import { SystemController } from './system.controller.js';
 import { SystemService } from './system.service.js';
 import { PING_TIMEOUT_MS, SYSTEM_QUEUE_EVENTS } from './system.tokens.js';
 
 @Module({
-  imports: [BullModule.registerQueue({ name: QUEUES.system })],
+  imports: [BullModule.registerQueue({ name: QUEUES.system }), QueueDashboardModule.forQueue(QUEUES.system)],
   controllers: [SystemController],
   providers: [
     SystemService,
