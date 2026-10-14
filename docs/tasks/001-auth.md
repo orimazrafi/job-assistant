@@ -28,6 +28,7 @@ Each card = one chat session = one commit (30–90 min). The app must start afte
 ### 001-03: Sign-up, login, logout endpoints
 - **Files:** `apps/api/src/auth/password-auth.*`
 - **Do:** sign-up and login with argon2id, session rotation on login, logout.
+- **Decisions:** password hashing (argon2id needs a native add-on vs bcrypt vs Node's built-in scrypt); request validation (zod pipe vs class-validator); how login avoids user enumeration and timing leaks.
 - **Don't:** rate limits, CSRF (slice B), SSO.
 - **Done when:** tests cover success, duplicate email, wrong password, logout.
 - **Verify:** sign up and log in with curl; `/api/auth/me` returns the user.

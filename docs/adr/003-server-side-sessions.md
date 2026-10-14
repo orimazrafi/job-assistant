@@ -28,3 +28,8 @@ flowchart LR
 ## Consequences
 - Good: instant revocation, nothing sensitive in the browser, simple mental model.
 - Bad: every request reads Redis (fast; acceptable). CSRF must be handled (SameSite + CSRF token + Origin check).
+
+## Interview angle
+- **At scale:** every request reads and writes Redis. At high traffic, write `lastSeenAt` at most once a minute and shard by session id. With many services or regions, a short-lived JWT plus a refresh token avoids a central lookup on every hop.
+- **Failure modes:** if Redis is down, nobody can be authenticated, so auth fails closed (401). Production needs a replicated or managed Redis.
+- **Likely follow-ups:** "Sessions or JWT? Defend it." "How do you log out all devices?" "What does SameSite not cover?" More in the notebook: [auth and sessions](../learning/auth-sessions.md).

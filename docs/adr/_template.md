@@ -20,3 +20,8 @@ flowchart LR
 ## Consequences
 - Good: ...
 - Bad / trade-offs: ...
+
+## Interview angle
+- **At scale:** what changes at 10x and 1000x, and what breaks first.
+- **Failure modes:** what happens when this part fails, and how we notice.
+- **Likely follow-ups:** questions an interviewer would ask about this choice.

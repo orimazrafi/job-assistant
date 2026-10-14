@@ -1,35 +1,37 @@
 # Progress
 
 ## Current focus
-Auth slice A (email account). Card 001-02 is done on branch `card/001-02`, in review. Repo: https://github.com/orimazrafi/job-assistant.
+Learning workflow (branch `chore/learning-workflow`, in review). Then auth slice A, card 001-03, starting with its decision brief. Repo: https://github.com/orimazrafi/job-assistant.
 
 ## Done recently
-- 001-02: Redis `SessionStore` (create, get, touch, destroy) with 7-day idle and 30-day absolute expiry (env-configurable), `__Host-sid` cookie helpers, `SessionGuard`, `@CurrentUser()`, and `GET /api/auth/me` (200 with the user, or 401 that clears a dead cookie).
+- Learning workflow: `mentor` skill and `learning.mdc` rule. Each card gets a decision brief before coding, and a code tour plus interview quiz after the merge. ADRs gain an "Interview angle" (backfilled for 001-006), task cards gain a **Decisions** field, and a notebook lives in `docs/learning/` (topic map, auth and sessions, concurrency and atomicity).
+- 001-02 ([PR #4](https://github.com/orimazrafi/job-assistant/pull/4)): Redis sessions (7 days idle, 30 days total), `__Host-sid` cookie, `SessionGuard`, `@CurrentUser()`, `GET /api/auth/me`.
 - 001-01: `users` table (SQL migration), `UsersRepository`, `pnpm db:migrate`; emails case-insensitive, enforced by the database.
-- Review at the PR merge: the agent commits, pushes card branches, and opens PRs; only the user merges. `main` is protected by the shell hook and the GitHub ruleset "Protect main" (PR + 3 CI checks, no force push, no bypass).
+- Review at the PR merge; `main` is protected by the shell hook and the GitHub ruleset "Protect main".
 - Tests: 32 unit (API 23), 8 hook-rule groups, 21 integration.
 
 ## Decisions made
-- Session lifetimes kept as in the spec: 7 days idle, 30 days total (user's choice; "Remember me" not needed).
-- Migrations: node-pg-migrate with plain SQL files — [ADR 006](adr/006-migrations-node-pg-migrate.md)
-- Earlier: [ADR 001](adr/001-postgres-plus-mongodb.md) Postgres + Mongo, [ADR 002](adr/002-bullmq-on-redis.md) BullMQ, [ADR 003](adr/003-server-side-sessions.md) sessions, [ADR 004](adr/004-free-sources-and-ai.md) free sources/AI, [ADR 005](adr/005-toolchain.md) toolchain.
+- The user wants to learn the why and the alternatives of every decision, for system design interviews: see `.cursor/rules/learning.mdc`.
+- Session lifetimes kept as in the spec: 7 days idle, 30 days total.
+- ADRs: [001](adr/001-postgres-plus-mongodb.md) Postgres + Mongo, [002](adr/002-bullmq-on-redis.md) BullMQ, [003](adr/003-server-side-sessions.md) sessions, [004](adr/004-free-sources-and-ai.md) free sources/AI, [005](adr/005-toolchain.md) toolchain, [006](adr/006-migrations-node-pg-migrate.md) migrations.
 
 ## Open issues
-- CI's E2E job does not run `pnpm db:migrate` yet. Needed in card 001-03, when login reads the table (CI change needs the user's approval).
+- CI's E2E job does not run `pnpm db:migrate` yet. Needed in card 001-04, when the browser E2E test signs up a user (CI change needs the user's approval). Card 001-03's own tests migrate by themselves.
+- Password hashing for 001-03: argon2 needs a native add-on, which `pnpm-workspace.yaml` (`allowBuilds`) currently denies; part of the decision brief.
 - The `Secure` session cookie works on `http://localhost` in Chromium and Firefox; check the E2E browser setup in card 001-04.
 - Local Postgres for this project is on host port **5433** (a native PostgreSQL 16 service uses 5432).
-- pnpm 12 requires explicit build-script approval; optional native add-ons are denied in `pnpm-workspace.yaml` (`allowBuilds`).
 - Confirm seed list of central-Israel companies for spec 002.
 
 ## Next steps
-1. 001-03: sign-up / login / logout endpoints (argon2id, session rotation; add `pnpm db:migrate` to CI's E2E job).
-2. 001-04: login UI and E2E journey.
+1. 001-03: decision brief (hashing, validation, enumeration and timing), then sign-up / login / logout endpoints.
+2. 001-04: login UI and E2E journey (add `pnpm db:migrate` to CI's E2E job).
 3. 001-05: logout of all devices.
 
 ## Roadmap
 - [x] AI workflow setup
 - [x] Walking skeleton + CI
 - [x] Guardrails (rules + shell hook + review at PR merge + GitHub ruleset)
+- [x] Learning workflow (briefs, tours, quizzes, notebook)
 - [ ] Auth (001-01, 001-02 done)
 - [ ] Job fetching
 - [ ] Relevance scoring
