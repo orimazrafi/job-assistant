@@ -26,3 +26,18 @@ Classic system design interview topics, and where each one shows up in this proj
 | Scaling and replication | Not covered: single-node stores | Not covered | Discuss in "At scale" sections |
 
 When a card touches a topic, its entry is created or updated in the same PR.
+
+## Catch-up path
+
+Decisions made before the learning workflow existed, replayed as lessons (about 20-30 minutes each).
+Each lesson: a decision brief as if choosing again (the problem, the options, what we chose and why, and what would change the choice), then a quiz, then a notebook entry.
+
+- [ ] 1. **System shape:** API, a separate worker, and web in one monorepo; a walking skeleton first. ([architecture](../architecture.md), [ADR 005](../adr/005-toolchain.md))
+- [ ] 2. **Data stores:** Postgres, MongoDB, and Redis, and what each one holds. ([ADR 001](../adr/001-postgres-plus-mongodb.md))
+- [ ] 3. **Background jobs:** BullMQ vs RabbitMQ, Kafka, or cron. ([ADR 002](../adr/002-bullmq-on-redis.md))
+- [ ] 4. **Sessions vs JWT:** mostly covered in the code tours; quiz only. ([ADR 003](../adr/003-server-side-sessions.md), [notes](auth-sessions.md))
+- [ ] 5. **Schema and migrations:** the `users` table (uuid keys, normalized email, unique constraint), migration tool, migrating as a separate step. ([ADR 006](../adr/006-migrations-node-pg-migrate.md))
+- [ ] 6. **Toolchain and testing:** ESM, raw drivers vs an ORM, the test pyramid with real databases, validating env at startup. ([ADR 005](../adr/005-toolchain.md))
+- [ ] 7. **API design in NestJS:** layers, dependency injection, typed errors with one exception filter, health checks. (no ADR)
+- [ ] 8. **Delivery and safety:** the CI pipeline, branch protection, review at the PR, the guardrail hook. (no ADR)
+- [ ] 9. **Free sources and AI:** public ATS APIs instead of scraping, the `LlmProvider` abstraction. Best right before job fetching. ([ADR 004](../adr/004-free-sources-and-ai.md))
